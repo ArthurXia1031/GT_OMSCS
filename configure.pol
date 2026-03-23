@@ -1,0 +1,22 @@
+# RuleNumber,Action,Source MAC,Destination MAC,Source IP,Destination IP,Protocol,Source Port,Destination Port,Comment/Note
+1,Block,-,-,10.0.30.4/32,-,6,-,-,Block cn4 TCP out
+2,Block,-,-,10.0.30.5/32,-,-,-,-,Block cn5 out
+3,Block,-,-,-,10.0.30.5/32,-,-,-,Block cn5 in
+4,Block,-,-,-,10.0.1.0/24,1,-,-,Block US ICMP in
+5,Block,-,-,-,10.0.20.0/24,1,-,-,Block IN ICMP in
+6,Block,-,-,-,10.0.40.0/24,1,-,-,Block UK ICMP in
+7,Allow,-,-,10.0.0.0/24,10.0.1.0/24,1,-,-,Allow HQ ping US
+8,Allow,-,-,10.0.0.0/24,10.0.20.0/24,1,-,-,Allow HQ ping IN
+9,Allow,-,-,10.0.0.0/24,10.0.40.0/24,1,-,-,Allow HQ ping UK
+10,Block,-,-,10.0.30.3/32,-,6,80,-,Block cn3 HTTP response out
+11,Block,-,-,10.0.30.3/32,-,6,443,-,Block cn3 HTTPS response out
+12,Block,-,-,10.0.40.128/30,10.0.1.32/30,6,-,9520,Block uk2-5 TCP 9520
+13,Block,-,-,10.0.20.124/30,10.0.1.32/30,6,-,9520,Block in4-in5 TCP 9520
+14,Block,-,-,10.0.1.125/32,10.0.1.32/30,6,-,9520,Block us5 TCP 9520
+15,Block,-,-,10.0.0.220/32,10.0.1.32/30,6,-,9520,Block hq5 TCP 9520
+16,Block,00:00:00:01:00:1e,-,-,-,17,-,-,Block rogue Pi UDP
+17,Block,-,-,-,10.0.0.0/24,6,-,25,Block HQ Port 25
+18,Block,-,-,-,10.0.1.0/24,6,-,25,Block US Port 25
+19,Block,-,-,-,10.0.20.0/24,6,-,25,Block IN Port 25
+20,Block,-,-,-,10.0.30.0/24,6,-,25,Block CN Port 25
+21,Block,-,-,-,10.0.40.0/24,6,-,25,Block UK Port 25
