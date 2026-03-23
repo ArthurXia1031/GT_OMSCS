@@ -46,6 +46,7 @@ def firewall_policy_processing(policies):
 
         rule = of.ofp_flow_mod()
         rule.match = of.ofp_match()
+        rule.match.dl_type = 0x0800 # Assume all traffic is IPv4
 
         is_allow = (policy['action'] == 'Allow')
         
@@ -64,25 +65,21 @@ def firewall_policy_processing(policies):
             rule.match.dl_dst = EthAddr(policy['mac-dst'])
 
         if policy['ipprotocol'] != '-':
-            rule.match.dl_type = 0x0800
             rule.match.nw_proto = int(policy['ipprotocol'])
 
         if policy['ip-src'] != '-':
-            rule.match.dl_type = 0x0800
-            rule.match.nw_src = policy['ip-src']
+            rule.match.nw_src = (policy['ip-src-address'], int(policy['ip-src-subnet']))
         if policy['ip-dst'] != '-':
-            rule.match.dl_type = 0x0800
-            rule.match.nw_dst = policy['ip-dst']
+            rule.match.nw_dst = (policy['ip-dst-address'], int(policy['ip-dst-subnet']))
 
         if policy['port-src'] != '-':
-            rule.match.dl_type = 0x0800
             rule.match.tp_src = int(policy['port-src'])
         if policy['port-dst'] != '-':
-            rule.match.dl_type = 0x0800
             rule.match.tp_dst = int(policy['port-dst'])
 
         if is_allow:
             rule.actions.append(of.ofp_action_output(port=of.OFPP_NORMAL))
+
 
 
 
