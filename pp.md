@@ -1,0 +1,3 @@
+Based on the above situation, the problem we are facing is how to mitigate the impact of when a testing merchant is mixed into our CPP process. With the guidance of Lulu and the assistance of Vladia, I am currently modifying the CPP Process to distinguish between different amount buckets in order to calculate the Follow-up Fraud Rate. This is to prevent low-dollar testing transactions from affecting the entire merchant's good accounts.
+
+So when such a situation occurs again, the follow-up fraud rate of the "low dollar" category is high. Only the corresponding "good" users of the merchant with the "low dollar" category will be batched into the process, rather than all the "good" accounts.
