@@ -2518,44 +2518,50 @@ function renderExecutiveSummary() {
   let critical = 0, watch = 0, stable = 0;
   let attackCount = 0, bleedCount = 0, anomalyCount = 0;
 
-  PROCESSES.forEach(p => {
-    const c = classify(p);
-    if (c.kind === "attack") { critical++; attackCount++; }
-    else if (c.kind === "bleed") { critical++; bleedCount++; }
-    else if (c.kind === "anomaly") { critical++; anomalyCount++; }
-    else if (c.kind === "early-attack" || c.kind === "early-bleed") { watch++; }
+  // System-wide roll-up across ALL families (Testing + CPP + Vendor), not just the active one.
+  // Each entry carries its OWN family's dollarStats / trend so classification uses the right baseline.
+  const SYS = [];
+  ["testing", "cpp", "vendor"].forEach(fam => {
+    const F = FAMS[fam];
+    if (!F) return;
+    F.procs.forEach(p => SYS.push({ p, ds: F.dollarStats[p.id], tr: F.trend[p.id] || { T1: [], T2: [], T3: [] } }));
+  });
+
+  SYS.forEach(({ p, ds }) => {
+    const zA = (p.afpr - p.mu) / (p.sd || 1);
+    const kind = classifyZ(zA, ds ? ds.z : 0);
+    if (kind === "attack") { critical++; attackCount++; }
+    else if (kind === "bleed") { critical++; bleedCount++; }
+    else if (kind === "anomaly") { critical++; anomalyCount++; }
+    else if (kind === "early-attack" || kind === "early-bleed") { watch++; }
     else { stable++; }
   });
 
-  const totalProcesses = PROCESSES.length;
+  const totalProcesses = SYS.length;
   const stableRatio = totalProcesses > 0 ? Math.round(((totalProcesses - critical) / totalProcesses) * 100) : 100;
 
   let totalFraudToday = 0;
   let totalFraudMean = 0;
-  PROCESSES.forEach(p => {
-    const stats = DOLLAR_STATS[p.id];
-    if (stats) {
-      totalFraudToday += stats.today;
-      totalFraudMean += stats.mu;
-    }
+  SYS.forEach(({ ds }) => {
+    if (ds) { totalFraudToday += ds.today; totalFraudMean += ds.mu; }
   });
   const fraudDiffPct = totalFraudMean > 0 ? ((totalFraudToday - totalFraudMean) / totalFraudMean * 100) : 0;
   const fraudDiffStr = fraudDiffPct >= 0 ? `+${fraudDiffPct.toFixed(1)}%` : `${fraudDiffPct.toFixed(1)}%`;
   const fraudColorClass = totalFraudToday > totalFraudMean ? "var(--bad)" : "var(--good)";
 
   let sumAfpr = 0;
-  PROCESSES.forEach(p => sumAfpr += p.afpr);
+  SYS.forEach(({ p }) => sumAfpr += p.afpr);
   const avgAfpr = totalProcesses > 0 ? (sumAfpr / totalProcesses).toFixed(1) : "0.0";
 
-  // Helper to classify for a historical dayIdx
-  function classifyHist(p, dayIdx) {
+  // Classify a process for a historical dayIdx using ITS family's trend (tr).
+  function classifyHist(p, dayIdx, tr) {
     const afprHist = p.afprHist;
     const histA = afprHist.slice(dayIdx - 30, dayIdx);
     const muA = mean(histA), sdA = std(histA) || 1;
     const zA = (afprHist[dayIdx] - muA) / sdA;
 
     const series = Array(NDAYS).fill(0);
-    TIERS.forEach(t => TREND[p.id][t].forEach((v, i) => series[i] += v));
+    TIERS.forEach(t => (tr[t] || []).forEach((v, i) => series[i] += v));
     const todayD = series[dayIdx];
     const histD = series.slice(dayIdx - 30, dayIdx);
     const muD = mean(histD), sdD = std(histD) || 1;
@@ -2570,42 +2576,28 @@ function renderExecutiveSummary() {
     return { kind: "stable" };
   }
 
-  // Compute 7-day histories for sparklines
+  // 7-day histories for sparklines — system-wide (one pass over all families per day).
   const stableHist = [];
   const fraudHist = [];
   const alertHist = [];
   const afprHist = [];
 
   for (let d = NDAYS - 7; d < NDAYS; d++) {
-    // Stable Ratio
-    let stabCount = 0;
-    PROCESSES.forEach(p => {
-      const k = classifyHist(p, d).kind;
-      if (k !== "attack" && k !== "bleed" && k !== "anomaly") stabCount++;
+    let stabCount = 0, critCount = 0, sumD = 0, sumA = 0;
+    SYS.forEach(({ p, tr }) => {
+      const k = classifyHist(p, d, tr).kind;
+      if (k === "attack" || k === "bleed" || k === "anomaly") critCount++;
+      else stabCount++;
+      TIERS.forEach(t => sumD += (tr[t] && tr[t][d] != null ? tr[t][d] : 0));
+      sumA += p.afprHist[d];
     });
     stableHist.push(stabCount);
-
-    // Fraud Sum
-    let sumD = 0;
-    PROCESSES.forEach(p => {
-      TIERS.forEach(t => sumD += TREND[p.id][t][d]);
-    });
-    fraudHist.push(sumD);
-
-    // Alert Count
-    let critCount = 0;
-    PROCESSES.forEach(p => {
-      const k = classifyHist(p, d).kind;
-      if (k === "attack" || k === "bleed" || k === "anomaly") critCount++;
-    });
     alertHist.push(critCount);
-
-    // Avg AFPR
-    let sumA = 0;
-    PROCESSES.forEach(p => sumA += p.afprHist[d]);
-    afprHist.push(sumA / totalProcesses);
+    fraudHist.push(sumD);
+    afprHist.push(totalProcesses > 0 ? sumA / totalProcesses : 0);
   }
 
+  
   // Sparkline SVG Generator
   function genSparklineSvg(data, color) {
     const W = 80, H = 28;
