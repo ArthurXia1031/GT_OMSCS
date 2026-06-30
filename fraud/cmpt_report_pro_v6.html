@@ -58,7 +58,7 @@
   .topnav button:hover{color:var(--ink)}
   .topnav button.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(31,111,235,.28)}
   /* sliding pill switch: sun left, moon right, knob glides under the active side */
-  .theme-toggle{position:relative;width:60px;height:30px;border-radius:16px;
+  .theme-toggle{position:relative;margin-left:auto;width:60px;height:30px;border-radius:16px;
           border:1.5px solid var(--line)!important;background:var(--panel-2)!important;
           padding:0!important;flex:none;cursor:pointer;transition:border-color .15s}
   .theme-toggle:hover{border-color:var(--accent)!important}
@@ -66,30 +66,6 @@
           border-radius:50%;background:var(--panel);border:1px solid var(--line);
           box-shadow:0 1px 3px rgba(0,0,0,.22);transition:left .2s cubic-bezier(.4,0,.2,1);z-index:1}
   html[data-theme="dark"] .tt-knob{left:calc(100% - 24px)}
-  .print-btn {
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 750;
-    padding: 8px 16px;
-    border: 1.5px solid var(--line);
-    border-radius: 10px;
-    background: var(--panel);
-    color: var(--ink-dim);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    transition: all .14s;
-    margin-left: auto;
-    margin-right: 12px;
-  }
-  .print-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(31,111,235,.03);
-  }
-  .print-btn svg {
-    stroke: currentColor;
-  }
   .theme-toggle svg{position:absolute;top:50%;transform:translateY(-50%);width:13px;height:13px;z-index:2;transition:color .2s,opacity .2s}
   .theme-toggle .sun-icon{left:7px;color:#e8a417;opacity:1}
   .theme-toggle .moon-icon{right:7px;color:var(--ink-faint);opacity:.45}
@@ -272,6 +248,8 @@
 
   /* ---- trend module ---- */
   .trend-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+  .subpanel-h{font-family:var(--sans);font-size:14.5px;font-weight:750;letter-spacing:-0.015em;color:var(--ink);margin-bottom:14px}
+  .subpanel-h span{font-weight:600;font-size:11.5px;color:var(--ink-faint);font-family:var(--mono);margin-left:6px}
   .leg-btn{font-family:var(--mono);font-size:11.5px;font-weight:600;padding:7px 15px;border:1.5px solid var(--line);border-radius:16px;background:var(--panel-2);color:var(--ink-dim);cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .12s}
   .leg-btn .swatch{width:8px;height:8px;border-radius:50%}
   .leg-btn.off{opacity:.4}
@@ -280,11 +258,11 @@
   .seg-toggle button{font-family:var(--mono);font-size:11.5px;font-weight:600;padding:7px 18px;background:var(--panel-2);color:var(--ink-dim);border:0;cursor:pointer}
   .seg-toggle button.active{background:var(--accent);color:#fff;font-weight:700}
   .seg-toggle.r{margin-left:auto}
-  .trend-wrap{display:flex;gap:24px}
-  .trend-chart{flex:1;min-width:0}
+  .trend-wrap{display:flex;gap:24px;flex-wrap:wrap}
+  .trend-chart{flex:1 1 340px;min-width:0}
   /* Side detail list: height locked to the chart so 20-process families don't stretch the
      section — overflow scrolls inside the column, header sticks to the top of the scroller. */
-  .spark-col{width:310px;flex:none;display:flex;flex-direction:column;gap:5px;max-height:420px;overflow-y:auto;overscroll-behavior:contain;padding-right:6px;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--panel)}
+  .spark-col{width:310px;max-width:100%;flex:none;display:flex;flex-direction:column;gap:5px;max-height:420px;overflow-y:auto;overscroll-behavior:contain;padding-right:6px;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--panel)}
   .spark-col::-webkit-scrollbar{width:7px}
   .spark-col::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
   .spark-col::-webkit-scrollbar-thumb:hover{background:var(--ink-faint)}
@@ -480,9 +458,6 @@
 </div>
 
 <nav class="topnav" id="topnav">
-  <button onclick="window.print()" class="print-btn" title="Print / Export Report as PDF">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:middle;margin-right:6px"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>Export PDF
-  </button>
   <button id="themeToggle" class="theme-toggle" title="Toggle dark / light mode" aria-label="Toggle dark mode">
     <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/><g stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 1.2v2.6M12 20.2v2.6M1.2 12h2.6M20.2 12h2.6M4.4 4.4l1.85 1.85M17.75 17.75l1.85 1.85M4.4 19.6l1.85-1.85M17.75 6.25l1.85-1.85"/></g></svg>
     <svg class="moon-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M21.2 13.2A9.2 9.2 0 1 1 10.8 2.8a7.2 7.2 0 0 0 10.4 10.4Z"/></svg>
@@ -495,9 +470,9 @@
 <div class="masthead">
   <h1>CMPT Daily Fraud Report<span class="tag">daily · CMPT</span></h1>
   <div class="meta-row">
-    <span>Data as of <b>2026-05-26</b></span>
-    <span>Generated <b>2026-05-27 02:14 ET</b></span>
-    <span>Trend window <b>recent 15d</b> vs <b>16–45d</b></span>
+    <span>Data as of <b id="mhAsOf">—</b></span>
+    <span>Generated <b id="mhGen">—</b></span>
+    <span>Batch window <b>Testing/ATM 10d · CPP/Vendor 15d</b></span>
     <span>SPC band <b>30d mean ± 2σ</b></span>
     <span id="globalStatus"></span>
   </div>
@@ -521,7 +496,7 @@
   <div class="sec-head">
     <span class="sec-num">00.1</span>
     <h2>Operations Command Center — Process Deviation Matrix</h2>
-    <span class="sub">AFPR Z × Approved Fraud $ Z (vs 30d baseline) · click bubble to inspect source</span>
+    <span class="sub">AFPR Z × Total Fraud $ Z (vs 30d baseline) · click bubble to inspect source</span>
   </div>
   <div class="panel">
     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px">
@@ -530,7 +505,7 @@
         <button class="tab-btn" data-ccfam="cpp">CPP</button>
         <button class="tab-btn" data-ccfam="vendor">Vendor</button>
       </div>
-      <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.05em">AFPR Z × Approved Fraud $ Z vs 30d baseline · per family</span>
+      <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.05em">AFPR Z × Total Fraud $ Z vs 30d baseline · per family</span>
     </div>
     <div id="cmdVerdict" class="cmd-verdict"></div>
     <div class="cmd-grid">
@@ -593,12 +568,23 @@
     <h2>Fraud Trend — Daily Time Series with Tier Composition</h2>
     <span class="sub">Top 3 by default · click legend to toggle</span>
   </div>
+  <div class="tab-strip sub pf-tabs" style="margin-bottom:16px">
+    <button class="tab-btn active" data-pf="testing">Testing / ATM</button>
+    <button class="tab-btn" data-pf="cpp">CPP</button>
+    <button class="tab-btn" data-pf="vendor">Vendor</button>
+  </div>
   <div class="panel">
-    <div class="tab-strip sub pf-tabs" style="margin-bottom:16px">
-      <button class="tab-btn active" data-pf="testing">Testing / ATM</button>
-      <button class="tab-btn" data-pf="cpp">CPP</button>
-      <button class="tab-btn" data-pf="vendor">Vendor</button>
+    <div class="subpanel-h">Total Fraud <span>— daily total fraud $ by process (same source as §00.1 axis)</span></div>
+    <div class="trend-controls" id="totalFraudLegend"></div>
+    <div class="trend-wrap">
+      <div class="trend-chart">
+        <svg id="totalFraudSvg" viewBox="0 0 920 360" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div class="spark-col" id="totalFraudSpark"></div>
     </div>
+  </div>
+  <div class="panel" style="margin-top:18px">
+    <div class="subpanel-h">Approved Fraud <span>— daily approved (leaked) $ by process / tier</span></div>
     <div class="trend-controls" id="trendLegend"></div>
     <div class="trend-wrap">
       <div class="trend-chart">
@@ -1274,10 +1260,14 @@ function renderLegend(){
     });
     wrap.appendChild(tierSel);
 
-    const sel=document.createElement("div"); sel.className="seg-toggle r";
+    // process picker: wrapping chips (like Process lines) so all 15+ are reachable; single-select
+    const sel=document.createElement("div"); sel.className="trend-controls"; sel.style.width="100%"; sel.style.margin="10px 0 0";
     PROCESSES.forEach(p=>{
-      const b=document.createElement("button"); b.className=tierFocus==p.id?"active":"";
-      b.textContent=p.short; b.onclick=()=>{tierFocus=p.id; renderLegend(); drawTrend();};
+      const on=tierFocus==p.id;
+      const b=document.createElement("button"); b.className="leg-btn"+(on?"":" off");
+      b.innerHTML=`<i class="swatch" style="background:${p.color}"></i>${p.short}`;
+      if(on){ b.style.borderColor="var(--accent)"; b.style.color="var(--accent)"; b.style.fontWeight="700"; }
+      b.onclick=()=>{tierFocus=p.id; renderLegend(); drawTrend();};
       sel.appendChild(b);
     });
     wrap.appendChild(sel);
@@ -1516,6 +1506,7 @@ function setDDMode(mode){
 /* ---------- MODULE 1.1: LARGE AFPR MULTI-LINE with ±2σ bands ---------- */
 let afprMetric = "zscore"; // "abs" or "zscore"
 const afprVisible=new Set(PROCESSES.slice().sort((a,b)=>b.fdlr-a.fdlr).slice(0,3).map(p=>p.id));
+const tfVisible=new Set(PROCESSES.slice().sort((a,b)=>b.fdlr-a.fdlr).slice(0,3).map(p=>p.id));
 function renderAfprLegend(){
   const wrap=$("#afprLegend"); wrap.innerHTML="";
   
@@ -1813,12 +1804,18 @@ function setProcFam(f, anchorEl) {
   // reset per-section view state to sensible defaults for the new family
   visible.clear();     PROCESSES.slice().sort((a, b) => b.fdlr - a.fdlr).slice(0, 3).forEach(p => visible.add(p.id));
   afprVisible.clear(); PROCESSES.slice().sort((a, b) => b.fdlr - a.fdlr).slice(0, 3).forEach(p => afprVisible.add(p.id));
+  tfVisible.clear();   PROCESSES.slice().sort((a, b) => b.fdlr - a.fdlr).slice(0, 3).forEach(p => tfVisible.add(p.id));
   tierFocus = null; trendTierFilter = "all"; ddSel = null; ddProcessFilter = "all";
   if (openDrawer) { openDrawer.remove(); openDrawer = null; }
   document.querySelectorAll(".pf-tabs .tab-btn").forEach(b => b.classList.toggle("active", b.dataset.pf === f));
+  // keep §00.1 Command Center on the same family (all four sections now share one family state)
+  ccFam = f;
+  document.querySelectorAll("#ccTabs .tab-btn").forEach(b => b.classList.toggle("active", b.dataset.ccfam === f));
+  drawCommandCenter(); renderVerdict(); renderAlerts();
   renderKPI();
   renderAfprLegend(); drawAfpr();
   renderLegend(); drawTrend();
+  renderTotalFraudLegend(); drawTotalFraud();
   renderDDTotal();
   const dd = document.getElementById("ddDetail");
   if (dd) dd.innerHTML = '<div class="dd-hint">← Click a merchant to see account / batch-reason detail</div>';
@@ -1872,7 +1869,7 @@ function drawCommandCenter() {
 
   // Axis titles
   svg += `<text x="${pl+iw/2}" y="${H-12}" fill="var(--ink-dim)" font-family="var(--sans)" font-size="10.5" font-weight="700" text-anchor="middle">AFPR Z-Score (vs 30d) — fraud-share signal</text>`;
-  svg += `<text x="15" y="${pt+ih/2}" fill="var(--ink-dim)" font-family="var(--sans)" font-size="10.5" font-weight="700" text-anchor="middle" transform="rotate(-90, 15, ${pt+ih/2})">Approved Fraud $ Z-Score (vs 30d)</text>`;
+  svg += `<text x="15" y="${pt+ih/2}" fill="var(--ink-dim)" font-family="var(--sans)" font-size="10.5" font-weight="700" text-anchor="middle" transform="rotate(-90, 15, ${pt+ih/2})">Total Fraud $ Z-Score (vs 30d)</text>`;
 
   // tick labels
   [-2, -1, 1, 2].forEach(t => {
@@ -1979,7 +1976,7 @@ function renderAlerts() {
     container.innerHTML += `
       <div class="alert-card green">
         <div class="alert-title" style="color:var(--good)">STABLE: No processes require action</div>
-        <div class="alert-desc">None are in the Attack, Bleed, or Anomaly quadrants. AFPR Z and Approved Fraud $ Z are within ±1.5σ of their 30-day baselines.</div>
+        <div class="alert-desc">None are in the Attack, Bleed, or Anomaly quadrants. AFPR Z and Total Fraud $ Z are within ±1.5σ of their 30-day baselines.</div>
       </div>`;
   } else {
     container.innerHTML += `<div class="alert-group-head">Action Recommended · ${critical.length}</div>`;
@@ -2015,15 +2012,15 @@ function renderAlerts() {
 
     let desc;
     if (a.kind === "attack") {
-      desc = `AFPR Z <b>${zAStr}σ</b> (fraud-account share rising) · Approved Fraud $ Z <b>${zDStr}σ</b> — today ${fmt$(p.dToday)} vs μ ${fmt$(p.dMu)} (σ ${fmt$(p.dSd)}).`;
+      desc = `AFPR Z <b>${zAStr}σ</b> (fraud-account share rising) · Total Fraud $ Z <b>${zDStr}σ</b> — today ${fmt$(p.dToday)} vs μ ${fmt$(p.dMu)} (σ ${fmt$(p.dSd)}).`;
     } else if (a.kind === "bleed") {
-      desc = `AFPR Z <b>${zAStr}σ</b> (total declines outstripping fraud catches) · Approved Fraud $ Z <b>${zDStr}σ</b> — today ${fmt$(p.dToday)} vs μ ${fmt$(p.dMu)}.`;
+      desc = `AFPR Z <b>${zAStr}σ</b> (total declines outstripping fraud catches) · Total Fraud $ Z <b>${zDStr}σ</b> — today ${fmt$(p.dToday)} vs μ ${fmt$(p.dMu)}.`;
     } else if (a.kind === "anomaly") {
-      desc = `AFPR Z <b>${zAStr}σ</b> and Approved Fraud $ Z <b>${zDStr}σ</b> move in directions that should not co-occur. Verify upstream data feed before reading either signal.`;
+      desc = `AFPR Z <b>${zAStr}σ</b> and Total Fraud $ Z <b>${zDStr}σ</b> move in directions that should not co-occur. Verify upstream data feed before reading either signal.`;
     } else if (a.kind === "early-attack") {
-      desc = `AFPR Z is dropping (<b>${zAStr}σ</b>), indicating a rising fraud share. Approved Fraud $ is still flat (<b>${zDStr}σ</b>). Watch closely for emerging carding attacks.`;
+      desc = `AFPR Z is dropping (<b>${zAStr}σ</b>), indicating a rising fraud share. Total Fraud $ is still flat (<b>${zDStr}σ</b>). Watch closely for emerging carding attacks.`;
     } else {
-      desc = `AFPR Z is rising (<b>${zAStr}σ</b>), indicating potential over-blocking. Approved Fraud $ remains stable (<b>${zDStr}σ</b>). Monitor for legitimate user friction.`;
+      desc = `AFPR Z is rising (<b>${zAStr}σ</b>), indicating potential over-blocking. Total Fraud $ remains stable (<b>${zDStr}σ</b>). Monitor for legitimate user friction.`;
     }
 
     let streakBadge = "";
@@ -2142,6 +2139,66 @@ window.hideTooltip = function() {
 // Generic hover crosshair for day-indexed line charts: snaps to the nearest day, draws a
 // dashed guide + dots on each visible series, and shows the values in the shared tooltip.
 // cfg: {W,pl,iw,pt,ih,n, dateAt(i)->str, rowsAt(i)->[{label,color,value,y}]}
+// ── §02 Total Fraud panel: daily TOTAL fraud $ per process (DLR_HIST = same data feeding §00.1 axis) ──
+function renderTotalFraudLegend(){
+  const wrap=$("#totalFraudLegend"); if(!wrap) return; wrap.innerHTML="";
+  const allOn = tfVisible.size===PROCESSES.length;
+  const allBtn=document.createElement("button");
+  allBtn.className="leg-btn"; allBtn.style.fontWeight="600"; allBtn.style.borderColor="var(--accent)";
+  allBtn.style.color=allOn?"#fff":"var(--accent)"; allBtn.style.background=allOn?"var(--accent)":"var(--panel-2)";
+  allBtn.textContent=allOn?"All processes":"Select all";
+  allBtn.onclick=()=>{ if(allOn){tfVisible.clear();} else {PROCESSES.forEach(p=>tfVisible.add(p.id));} renderTotalFraudLegend(); drawTotalFraud(); };
+  wrap.appendChild(allBtn);
+  PROCESSES.forEach(p=>{
+    const b=document.createElement("button"); b.className="leg-btn"+(tfVisible.has(p.id)?"":" off");
+    b.innerHTML=`<i class="swatch" style="background:${p.color}"></i>${p.short}`;
+    b.onclick=()=>{ tfVisible.has(p.id)?tfVisible.delete(p.id):tfVisible.add(p.id); renderTotalFraudLegend(); drawTotalFraud(); };
+    wrap.appendChild(b);
+  });
+}
+function drawTotalFraud(){
+  const W=920,H=360,pl=54,pr=16,pt=16,pb=30; const iw=W-pl-pr, ih=H-pt-pb;
+  const x=i=>pl+iw*i/(NDAYS-1);
+  const series={}; let max=0;
+  PROCESSES.forEach(p=>{ if(!tfVisible.has(p.id))return; const s=(DLR_HIST[p.id]||[]).slice(-NDAYS); series[p.id]=s; s.forEach(v=>max=Math.max(max,v)); });
+  max=max*1.1||1; const y=v=>pt+ih-(v/max*ih);
+  let svg="";
+  for(let g=0;g<=4;g++){const v=max*g/4,yy=y(v);svg+=`<line class="grid-line" x1="${pl}" y1="${yy}" x2="${W-pr}" y2="${yy}"/><text class="axis-lbl" x="${pl-6}" y="${yy+3}" text-anchor="end">${fmt$(v)}</text>`;}
+  { const _pd=procDates(); for(let i=0;i<NDAYS;i+=7) svg+=`<text class="axis-lbl" x="${x(i)}" y="${H-8}" text-anchor="middle">${_pd[i]||""}</text>`; }
+  const wx=x(NDAYS-WIN); svg+=`<line class="window-line" x1="${wx}" y1="${pt}" x2="${wx}" y2="${pt+ih}"/><text class="window-lbl" x="${wx+4}" y="${pt+10}">recent 15d \u25b8</text>`;
+  PROCESSES.forEach(p=>{ if(!series[p.id])return; const s=series[p.id];
+    const d=s.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)).join(" ");
+    svg+=`<path d="${d}" fill="none" stroke="${p.color}" stroke-width="1.6" opacity="0.92"/><circle cx="${x(NDAYS-1)}" cy="${y(s[NDAYS-1])}" r="2.6" fill="${p.color}"/>`;
+  });
+  const el=$("#totalFraudSvg"); if(!el) return; el.innerHTML=svg;
+  setupSvgHover("totalFraudSvg",{W,pl,iw,pt,ih,n:NDAYS, dateAt:i=>procDates()[i],
+    rowsAt:i=>PROCESSES.filter(p=>series[p.id]).map(p=>({label:p.short,color:p.color,value:fmt$(series[p.id][i]),y:y(series[p.id][i])})) });
+  renderTotalFraudSparks();
+}
+function renderTotalFraudSparks(){
+  const col=$("#totalFraudSpark"); if(!col) return; col.innerHTML="";
+  const hdr=document.createElement("div"); hdr.className="spark-hdr";
+  hdr.style.cssText="font-family:var(--mono);font-size:9px;color:var(--ink-faint);display:grid;grid-template-columns:1fr 60px 46px 46px;gap:7px;padding:0 7px 2px;text-transform:uppercase;letter-spacing:.04em";
+  hdr.innerHTML="<span>Process</span><span style='text-align:center'>15d spark</span><span style='text-align:right'>DoD</span><span style='text-align:right'>\u0394%</span>";
+  col.appendChild(hdr);
+  PROCESSES.forEach(p=>{
+    const s=(DLR_HIST[p.id]||[]).slice(-NDAYS);
+    const recent=s.slice(NDAYS-WIN), base=s.slice(NDAYS-WIN-WIN,NDAYS-WIN);
+    const rAvg=mean(recent), bAvg=mean(base)||1, delta=(rAvg-bAvg)/bAvg*100;
+    const todayVal=s[NDAYS-1], yestVal=s[NDAYS-2]||todayVal;
+    const dod=yestVal?((todayVal-yestVal)/yestVal*100):0;
+    const w=60,h=14,mx=Math.max(...recent),mn=Math.min(...recent),rng=(mx-mn)||1;
+    const pts=recent.map((v,i)=>`${(i/(recent.length-1)*w).toFixed(1)},${(h-((v-mn)/rng*h)).toFixed(1)}`).join(" ");
+    const row=document.createElement("div"); row.className="spark-row"; row.style.gridTemplateColumns="1fr 60px 46px 46px";
+    if(!tfVisible.has(p.id)) row.style.opacity=".45";
+    row.innerHTML=`<span class="spark-name" style="color:${p.color}">${p.short}</span>
+      <svg viewBox="0 0 ${w} ${h}" style="width:${w}px;height:${h}px"><polyline points="${pts}" fill="none" stroke="${p.color}" stroke-width="1.3"/></svg>
+      <span class="delta ${dod>=0?'up':'down'}" style="font-size:10.5px">${dod>=0?'+':''}${dod.toFixed(0)}%</span>
+      <span class="delta ${delta>=0?'up':'down'}">${delta>=0?'+':''}${delta.toFixed(0)}%</span>`;
+    row.onclick=()=>{ tfVisible.has(p.id)?tfVisible.delete(p.id):tfVisible.add(p.id); renderTotalFraudLegend(); drawTotalFraud(); };
+    col.appendChild(row);
+  });
+}
 function setupSvgHover(svgId, cfg) {
   const svg = document.getElementById(svgId);
   if (!svg) return;
@@ -2175,8 +2232,21 @@ function setupSvgHover(svgId, cfg) {
 window.focusProcessFromBubble = function(procId) {
   const p = PROCESSES.find(x => x.id === procId);
   if (!p) return;
-  const c = classify(p);
-  dispatchInspect(p, c.kind);
+  // jump to §01.2 Process AFPR and isolate the clicked process
+  afprVisible.clear(); afprVisible.add(procId);
+  renderAfprLegend(); drawAfpr();
+  const svg = document.getElementById("afprSvg");
+  const sec = svg ? svg.closest("section") : null;
+  if (sec) {
+    sec.scrollIntoView({ behavior: "smooth", block: "start" });
+    const panel = sec.querySelector(".panel");
+    if (panel) {
+      panel.style.transition = "box-shadow .2s, outline .2s";
+      panel.style.outline = "2.5px solid var(--accent)";
+      panel.style.boxShadow = "0 0 16px rgba(31,111,235,0.3)";
+      setTimeout(() => { panel.style.outline = "none"; panel.style.boxShadow = "none"; }, 2500);
+    }
+  }
 };
 
 // Collapsible process accordion toggle
@@ -2767,8 +2837,9 @@ function initSrcPerf() {
 renderExecutiveSummary();
 renderAfprLegend(); drawAfpr();
 renderKPI(); renderLegend(); drawTrend();
+renderTotalFraudLegend(); drawTotalFraud();
 drawCommandCenter(); renderVerdict(); renderAlerts();
-document.querySelectorAll("#ccTabs .tab-btn").forEach(b => b.onclick = () => setCcFam(b.dataset.ccfam));
+document.querySelectorAll("#ccTabs .tab-btn").forEach(b => b.onclick = () => setProcFam(b.dataset.ccfam, b));
 document.querySelectorAll(".pf-tabs .tab-btn").forEach(b => b.onclick = () => setProcFam(b.dataset.pf, b));
 $("#ddModeToggle").querySelectorAll("button").forEach(b=>b.onclick=()=>setDDMode(b.dataset.mode));
 setDDMode("total"); renderDDTotal();
@@ -2831,6 +2902,15 @@ document.getElementById("volModal").addEventListener("click", (e) => { if (e.tar
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeVolModal(); });
 
 // Item 1: Global status pill in masthead
+// Masthead dates: injected meta if present, else stamp today's date at render.
+(function mastheadDates(){
+  const m = (typeof INJECTED_DATA!=='undefined' && INJECTED_DATA && INJECTED_DATA.meta) || {};
+  const z = n => String(n).padStart(2,'0');
+  const now = new Date();
+  const ymd = `${now.getFullYear()}-${z(now.getMonth()+1)}-${z(now.getDate())}`;
+  const a = document.getElementById('mhAsOf'); if (a) a.textContent = m.dataAsOf || ymd;
+  const g = document.getElementById('mhGen');  if (g) g.textContent = m.generated || `${ymd} ${z(now.getHours())}:${z(now.getMinutes())}`;
+})();
 (function renderGlobalStatus(){
   const attacks = PROCESSES.filter(p => classify(p).kind === "attack").length;
   const bleeds  = PROCESSES.filter(p => classify(p).kind === "bleed").length;
