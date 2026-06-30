@@ -1287,7 +1287,12 @@ function toggleTier(idx,card){
   const rows=p.tiers.map(t=>`<tr><td><span class="pill" style="background:color-mix(in srgb, ${TIER_COLORS[t.t]} 13%, transparent);color:${TIER_COLORS[t.t]}">${t.t}</span></td><td class="num">${t.afpr}</td><td class="num">${t.tot.toLocaleString()}</td><td class="num">${t.frd}</td><td class="num">${fmt$(t.fdlr)}</td></tr>`).join("");
   dr.innerHTML=`<div class="tier-inner"><h4>${p.short} — Tier breakdown</h4>
     <table><thead><tr><th>Tier</th><th>AFPR</th><th>Tot Acct</th><th>Frd Acct</th><th>Fraud $</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-  card.after(dr); openDrawer=dr;
+  // Insert the drawer AFTER the LAST card on the clicked card's row, so that row's cards
+  // stay put (no gap, no reflow within the row); only rows below shift down for the drawer.
+  const _cards=[...document.querySelectorAll(".kpi-card")];
+  const _top=card.offsetTop; let _rowLast=card;
+  _cards.forEach(c=>{ if(Math.abs(c.offsetTop-_top)<2) _rowLast=c; });
+  _rowLast.after(dr); openDrawer=dr;
 }
 
 /* ---------- MODULE A: TREND with tier composition ---------- */
