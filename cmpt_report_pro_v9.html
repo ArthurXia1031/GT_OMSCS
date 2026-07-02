@@ -21,6 +21,8 @@
     --bad-soft:rgba(207,34,46,.08); --good-soft:rgba(26,127,55,.08);
     /* §02 Approved-vs-Declined split — muted, low-saturation tones (not the loud good/bad) */
     --tf-declined:#4b857a; --tf-approved:#c06a5b;
+    /* §01.3 HS-vs-Non-HS split + T2/T3 verified sub-band */
+    --tf-hs:#5b7fb0; --tf-nonhs:#9aa7b5;
     --band:rgba(31,111,235,.12); --band-warn:rgba(154,103,0,.12);
     --sans: 'Lato', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --mono: var(--sans); /* Map mono to sans so everything inherits unified sans-serif seamlessly */
@@ -37,6 +39,7 @@
     --accent:#58a6ff; --good:#3fb950; --warn:#d29922; --bad:#f85149;
     --bad-soft:rgba(248,81,73,.12); --good-soft:rgba(63,185,80,.12);
     --tf-declined:#6bb3a5; --tf-approved:#e0917f;
+    --tf-hs:#7ea6d8; --tf-nonhs:#8593a3;
     --band:rgba(88,166,255,.16); --band-warn:rgba(210,153,34,.16);
     /* brightened series palette — the light-mode hues are too dark to read on #0d1117 */
     --pc-blue:#58a6ff; --pc-purple:#b694ff; --pc-teal:#3ec9b5; --pc-green:#3fb950;
@@ -80,6 +83,15 @@
   html[data-theme="dark"] .theme-toggle .moon-icon{color:#9ecbff;opacity:1}
   .page{display:none}
   .page.active{display:block}
+
+  /* one-click back-to-top — appears after scrolling down, bottom-right */
+  .back-to-top{position:fixed;right:24px;bottom:24px;z-index:60;width:42px;height:42px;border-radius:12px;
+    background:var(--panel);border:1.5px solid var(--line);color:var(--ink-dim);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;box-shadow:var(--v7-elev-1);
+    opacity:0;transform:translateY(10px);pointer-events:none;
+    transition:opacity .2s var(--v7-ease),transform .2s var(--v7-ease),border-color .15s,color .15s,box-shadow .15s}
+  .back-to-top.show{opacity:1;transform:none;pointer-events:auto}
+  .back-to-top:hover{border-color:var(--accent);color:var(--accent);box-shadow:var(--v7-elev-2)}
 
   /* ---- left section navigator (scroll-spy) ----
      Transparent rail, vertically centered on the left edge: no panel chrome — just a thin
@@ -458,7 +470,7 @@
   }
   @media print{
     body{padding:20px 30px;font-size:12px;}
-    .action-btn,.seg-toggle,.leg-btn,.dd-mode,.topnav,.sidenav{display:none!important}
+    .action-btn,.seg-toggle,.leg-btn,.dd-mode,.topnav,.sidenav,.back-to-top{display:none!important}
     body{padding-left:30px!important}
     .page{display:block!important}
     .panel{box-shadow:none;break-inside:avoid}
@@ -558,6 +570,10 @@
 </nav>
 
 <nav class="sidenav" id="sidenav"></nav>
+
+<button id="backToTop" class="back-to-top" title="Back to top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M6 12l6-6 6 6"/></svg>
+</button>
 
 <div class="masthead">
   <h1>DFS CMPT Daily Fraud Report<span class="tag">internal</span></h1>
@@ -702,6 +718,14 @@
   </div>
   <div class="panel" style="margin-top:18px">
     <div class="subpanel-h">Approved Fraud <span>— daily approved $ by process / tier</span><span id="apBadge" class="filt-badge"></span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <span style="font-family:var(--mono);font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em">High Spender</span>
+      <div class="seg-toggle" id="hsSegToggle2" role="group" aria-label="High-spender segment">
+        <button data-hs="all" class="active" aria-pressed="true">Total</button>
+        <button data-hs="hs" aria-pressed="false">HS only</button>
+        <button data-hs="nonhs" aria-pressed="false">Non-HS</button>
+      </div>
+    </div>
     <div class="trend-controls" id="trendLegend"></div>
     <div class="trend-wrap">
       <div class="trend-chart">
@@ -1416,15 +1440,22 @@ const visible=new Set(PROCESSES.slice().sort((a,b)=>b.fdlr-a.fdlr).slice(0,3).ma
 let hsSeg = "all";  // "all" | "hs" | "nonhs" — High-Spender filter for §02 (both charts)
 let excludeV15 = false;  // Approved tier chart: drop 15-min-verified (must-approve) $ → rule-declinable only
 function famHas(k){ const F=FAMS[procFam]; return !F || F[k]!==false; }
+// Both HS segment toggles (top of §01.3 + inside the Approved Fraud panel) share [data-hs] buttons
+// and one hsSeg state, so you can switch it from either chart without scrolling back up.
+function setHsSeg(seg){
+  hsSeg = seg;
+  document.querySelectorAll("[data-hs]").forEach(x=>{ const on=x.dataset.hs===seg; x.classList.toggle("active",on); x.setAttribute("aria-pressed",on); });
+  drawTrend(); drawTotalFraud(); updateFilterBadges();
+}
 function syncFilterAvailability(){
   const hsOk=famHas("hsAvail");
-  document.querySelectorAll("#hsSegToggle button").forEach(b=>{ b.disabled=!hsOk; b.style.opacity=hsOk?"":"0.4"; b.style.cursor=hsOk?"":"not-allowed"; });
-  const hw=document.getElementById("hsSegToggle"); if(hw) hw.title = hsOk ? "" : "High-Spender breakdown not provided by the pipeline for this family";
-  if(!hsOk && hsSeg!=="all"){ hsSeg="all"; document.querySelectorAll("#hsSegToggle button").forEach(x=>{ const on=x.dataset.hs==="all"; x.classList.toggle("active",on); x.setAttribute("aria-pressed",on); }); }
+  document.querySelectorAll("[data-hs]").forEach(b=>{ b.disabled=!hsOk; b.style.opacity=hsOk?"":"0.4"; b.style.cursor=hsOk?"":"not-allowed"; b.title = hsOk ? "" : "High-Spender breakdown not provided by the pipeline for this family"; });
+  if(!hsOk && hsSeg!=="all"){ hsSeg="all"; document.querySelectorAll("[data-hs]").forEach(x=>{ const on=x.dataset.hs==="all"; x.classList.toggle("active",on); x.setAttribute("aria-pressed",on); }); }
+  if(!hsOk && tfMode==="hssplit") tfMode="process";   // HS-split needs HS data
   if(!famHas("v15Avail")) excludeV15=false;
 }
 function hsMul(pid, i){ if (hsSeg === "all") return 1; const sh = (HSSHARE[pid] && HSSHARE[pid][i] != null) ? HSSHARE[pid][i] : 0.4; return hsSeg === "hs" ? sh : (1 - sh); }
-function filtBadgeHtml(withV15){ const parts=[]; if(hsSeg==="hs")parts.push("HS"); else if(hsSeg==="nonhs")parts.push("Non-HS"); if(withV15&&excludeV15)parts.push("excl.15m-verif"); return parts.length?` <span style="font-family:var(--mono);font-size:8px;font-weight:800;color:var(--warn);border:1px solid rgba(154,103,0,.35);border-radius:3px;padding:0 3px;vertical-align:middle">${parts.join(" · ")}</span>`:""; }
+function filtBadgeHtml(withV15){ const parts=[]; if(hsSeg==="hs")parts.push("HS"); else if(hsSeg==="nonhs")parts.push("Non-HS"); if(withV15&&excludeV15)parts.push("excl v15"); return parts.length?` <span style="font-family:var(--mono);font-size:8px;font-weight:800;color:var(--warn);border:1px solid rgba(154,103,0,.35);border-radius:3px;padding:0 3px;vertical-align:middle;white-space:nowrap">${parts.join(" · ")}</span>`:""; }
 function updateFilterBadges(){ const hsTxt=hsSeg==="hs"?"HS ONLY":hsSeg==="nonhs"?"NON-HS":""; const set=(id,txt,cls)=>{ const b=document.getElementById(id); if(!b)return; if(txt){ b.className="filt-badge on "+cls; b.textContent=txt; } else { b.className="filt-badge"; b.textContent=""; } }; set("tfBadge", hsTxt, hsSeg==="nonhs"?"nonhs":"hs"); const apTxt=[hsTxt, excludeV15?"EXCL. 15-MIN VERIFIED":""].filter(Boolean).join(" · "); set("apBadge", apTxt, excludeV15?"v15":(hsSeg==="nonhs"?"nonhs":"hs")); }
 function procSum(id){ const s=Array(NDAYS).fill(0); TIERS.forEach(t=>TREND[id][t].forEach((v,i)=>s[i]+=v)); return s; }
 let chipExpanded={};
@@ -1442,7 +1473,20 @@ function renderLegend(){
   const wrap=$("#trendLegend"); wrap.innerHTML="";
   const modeT=document.createElement("div"); modeT.className="seg-toggle";
   modeT.innerHTML=`<button data-tm="line" class="${trendMode=='line'?'active':''}" aria-pressed="${trendMode=='line'}">Process lines</button><button data-tm="tier" class="${trendMode=='tier'?'active':''}" aria-pressed="${trendMode=='tier'}">Tier stack</button>`;
-  modeT.querySelectorAll("button").forEach(b=>b.onclick=()=>{ trendMode=b.dataset.tm; if(trendMode=='tier'&&!tierFocus) tierFocus=[...visible][0]||PROCESSES[0].id; renderLegend(); drawTrend(); });
+  modeT.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+    trendMode=b.dataset.tm;
+    if(trendMode=='tier'){
+      // Tier stack shows ONE process — focus the top-$ process currently selected in Process lines,
+      // so switching modes keeps you on the same selection.
+      if(!tierFocus || !visible.has(tierFocus)){
+        const vis=PROCESSES.filter(p=>visible.has(p.id)).sort((a,b)=>b.fdlr-a.fdlr);
+        tierFocus=(vis[0]||PROCESSES[0]).id;
+      }
+    } else if(tierFocus && !visible.has(tierFocus)){
+      visible.add(tierFocus);   // returning to lines: keep the process you drilled into selected
+    }
+    syncTrendCharts();          // keep §01.2 AFPR + Total Fraud in sync too
+  });
   wrap.appendChild(modeT);
 
   if(trendMode=="line"){
@@ -1484,6 +1528,14 @@ function renderLegend(){
     if(!famHas("v15Avail")){ v15btn.disabled=true; v15btn.style.opacity="0.4"; v15btn.style.cursor="not-allowed"; v15btn.title="15-min-verified $ not provided by the pipeline for this family"; }
     v15btn.onclick=()=>{ if(v15btn.disabled) return; excludeV15=!excludeV15; renderLegend(); drawTrend(); updateFilterBadges(); };
     wrap.appendChild(v15btn);
+    // T1 has no 15-min verification (verification precedes tier 2/3) — surface it right next to the
+    // toggle so it's obvious the exclusion is a no-op for T1.
+    if(trendTierFilter==="T1"){
+      const note=document.createElement("span");
+      note.style.cssText="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--warn);white-space:nowrap";
+      note.textContent="T1 has no 15-min verification — exclusion doesn't apply";
+      wrap.appendChild(note);
+    }
 
     // process picker: wrapping chips (like Process lines) so all 15+ are reachable; single-select
     const sel=document.createElement("div"); sel.className="trend-controls"; sel.style.width="100%"; sel.style.margin="10px 0 0";
@@ -1532,14 +1584,31 @@ function drawTrend(){
     // (fraud-account context is drawn as a LINE on top of the $ areas below — faint bars sitting
     //  behind the opaque areas were effectively invisible.)
     // stacked $ areas
-    const base=Array(NDAYS).fill(0);
-    shownT.forEach(t=>{
-      let top=base.map((b,i)=>b+dVal(t,i));
-      let up=top.map((v,i)=>x(i).toFixed(1)+" "+y(v).toFixed(1));
-      let dn=base.map((v,i)=>x(i).toFixed(1)+" "+y(v).toFixed(1)).reverse();
-      svg+=`<path d="M${up.join(" L")} L${dn.join(" L")} Z" fill="${TIER_COLORS[t]}" opacity="0.72"/>`;
-      base.forEach((b,i)=>base[i]=top[i]);
-    });
+    const singleV15 = shownT.length===1 && (shownT[0]==="T2"||shownT[0]==="T3") && V15SHARE[p.id] && V15SHARE[p.id][shownT[0]];
+    const areaLH=(lo,hi)=>{ let d="M "+x(0).toFixed(1)+" "+y(hi[0]).toFixed(1); for(let i=1;i<NDAYS;i++) d+=" L "+x(i).toFixed(1)+" "+y(hi[i]).toFixed(1); for(let i=NDAYS-1;i>=0;i--) d+=" L "+x(i).toFixed(1)+" "+y(lo[i]).toFixed(1); return d+" Z"; };
+    if(singleV15){
+      // single T2/T3: split the tier area into rule-declinable (deep) + 15-min-verified (light shade)
+      // so the verified proportion reads off the chart. When "Exclude 15-min" is on, dVal already drops
+      // the verified part → only the rule-declinable band remains.
+      const t=shownT[0];
+      const full=i=>TREND[p.id][t][i]*hsMul(p.id,i);           // approved $ before v15 exclusion
+      const zeros=Array(NDAYS).fill(0);
+      const ruleDecl=Array.from({length:NDAYS},(_,i)=>full(i)*(1-(V15SHARE[p.id][t][i]||0)));
+      const vTop=Array.from({length:NDAYS},(_,i)=> excludeV15 ? ruleDecl[i] : full(i));
+      svg+=`<path d="${areaLH(zeros,ruleDecl)}" fill="${TIER_COLORS[t]}" opacity="0.82"/>`;             // rule-declinable (tier color)
+      if(!excludeV15){
+        svg+=`<path d="${areaLH(ruleDecl,vTop)}" fill="var(--ink-faint)" opacity="0.45"/>`;            // 15-min verified (neutral grey — contrasts with the tier hue)
+        const bl=ruleDecl.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)).join(" ");
+        svg+=`<path d="${bl}" fill="none" stroke="${TIER_COLORS[t]}" stroke-width="1.3" opacity="0.9"/>`; // crisp split boundary
+      }
+    } else {
+      const base=Array(NDAYS).fill(0);
+      shownT.forEach(t=>{
+        let top=base.map((b,i)=>b+dVal(t,i));
+        svg+=`<path d="${areaLH(base,top)}" fill="${TIER_COLORS[t]}" opacity="0.72"/>`;
+        base.forEach((b,i)=>base[i]=top[i]);
+      });
+    }
     // fraud-account volume — secondary-axis LINE drawn ON TOP so it stays readable over the $ areas.
     // Read against the $ stack: $ rising while this line stays flat ⇒ single-account spike, not systemic.
     if(maxAacct>0){
@@ -1555,11 +1624,18 @@ function drawTrend(){
       if(d0>0 && d1>d0*1.6 && Math.abs(a1-a0)<=1){ flagged++; svg+=`<text x="${x(i).toFixed(1)}" y="${(y(d1)-6).toFixed(1)}" text-anchor="middle" font-size="11" fill="var(--warn)" style="cursor:help"><title>$ spike without account growth — likely single-account, not systemic</title>\u26a0</text>`; } }
     // secondary (fraud-account) axis ticks on the right edge, so bar heights are readable
     [0, Math.round(maxAacct/2), Math.round(maxAacct)].forEach(av=>{ if(maxAacct<=0) return; const yy=pt+ih-(av/maxA*ih); svg+=`<text x="${(W-pr).toFixed(1)}" y="${(yy-2).toFixed(1)}" text-anchor="end" font-family="var(--mono)" font-size="8" fill="var(--ink-faint)" opacity="0.8">${av}</text>`; });
-    const v15note = excludeV15 ? `<span style="margin-left:6px;color:var(--warn)">· excl. 15-min verified (rule-declinable $)</span>` : "";
+    // (T1's "no 15-min verification" note lives next to the Exclude toggle in the controls row.)
+    const v15note = (excludeV15 && trendTierFilter!=="T1")
+      ? `<span style="margin-left:6px;color:var(--warn)">· excl. 15-min verified (rule-declinable $)</span>`
+      : "";
+    const v15SplitLeg = (singleV15 && !excludeV15)
+      ? `<span style="margin-left:6px;color:var(--ink-faint)"><i class="swatch" style="background:${TIER_COLORS[shownT[0]]};opacity:.82;border-radius:2px"></i>rule-declinable · <i class="swatch" style="background:var(--ink-faint);opacity:.55;border-radius:2px"></i>15-min verified</span>`
+      : "";
     const flagLeg = flagged ? `<span style="margin-left:6px;color:var(--warn)">\u26a0 = $ spike w/o acct growth</span>` : "";
-    tierLeg.innerHTML=`<span style="color:var(--ink-dim)">Tier composition — ${p.short}:</span>`+shownT.map(t=>`<span><i class="swatch" style="background:${TIER_COLORS[t]}"></i>${t}</span>`).join("")+`<span style="margin-left:6px;color:var(--ink-faint)"><span style="display:inline-block;width:15px;height:0;border-top:1.8px dashed var(--ink);opacity:.6;vertical-align:middle;margin-right:4px"></span>fraud accts (line · 0–${Math.round(maxAacct)})</span>`+v15note+flagLeg;
+    tierLeg.innerHTML=`<span style="color:var(--ink-dim)">Tier composition — ${p.short}:</span>`+shownT.map(t=>`<span><i class="swatch" style="background:${TIER_COLORS[t]}"></i>${t}</span>`).join("")+`<span style="margin-left:6px;color:var(--ink-faint)"><span style="display:inline-block;width:15px;height:0;border-top:1.8px dashed var(--ink);opacity:.6;vertical-align:middle;margin-right:4px"></span>fraud accts (line · 0–${Math.round(maxAacct)})</span>`+v15SplitLeg+v15note+flagLeg;
     hoverCfg={ dateAt:i=>procDates()[i], rowsAt:i=>{ let cum=0; const rows=shownT.map(t=>{ const v=dVal(t,i); cum+=v; return {label:p.short+" · "+t,color:TIER_COLORS[t],value:fmt$(v),y:y(cum)}; });
       const d=dSum(i), a=aSum(i), d0=i>0?dSum(i-1):d, a0=i>0?aSum(i-1):a;
+      if(singleV15 && !excludeV15){ const t=shownT[0]; const full=TREND[p.id][t][i]*hsMul(p.id,i); const vsh=(V15SHARE[p.id][t][i]||0); rows.push({label:"· of which 15-min verified", color:"var(--ink-faint)", value:`${fmt$(full*vsh)} · ${(vsh*100).toFixed(0)}%`, y:null}); }
       rows.push({divider:true});
       rows.push({label:"Fraud accounts", color:"var(--ink-dim)", value:`${Math.round(a)}${i>0?` (${Math.round(a-a0)>=0?"+":""}${Math.round(a-a0)} vs prev)`:""}`, y:null});
       rows.push({label:"$ / fraud acct", color:"var(--ink-dim)", value:fmt$(a?Math.round(d/a):0), y:null});
@@ -1576,7 +1652,7 @@ function renderSparks(){
   const hdr=document.createElement("div");
   hdr.className="spark-hdr";
   hdr.style.cssText="font-family:var(--mono);font-size:9px;color:var(--ink-faint);display:grid;grid-template-columns:1fr 60px 46px 46px;gap:7px;padding:0 7px 2px;text-transform:uppercase;letter-spacing:.04em";
-  hdr.innerHTML="<span>Process"+filtBadgeHtml(true)+"</span><span style='text-align:center'>15d spark</span><span style='text-align:right'>DoD</span><span style='text-align:right'>Δ%</span>";
+  hdr.innerHTML="<span style='white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>Process"+filtBadgeHtml(true)+"</span><span style='text-align:center'>15d spark</span><span style='text-align:right'>DoD</span><span style='text-align:right'>Δ%</span>";
   col.appendChild(hdr);
   PROCESSES.forEach(p=>{
     const s=procSum(p.id).map((v,i)=>v*hsMul(p.id,i)); const recent=s.slice(NDAYS-WIN), base=s.slice(NDAYS-WIN-WIN,NDAYS-WIN);
@@ -2402,8 +2478,9 @@ function renderTotalFraudLegend(){
   const wrap=$("#totalFraudLegend"); if(!wrap) return; wrap.innerHTML="";
   // View toggle: per-process total lines, or Approved-vs-Declined split of the selected processes.
   const modeT=document.createElement("div"); modeT.className="seg-toggle"; modeT.style.marginRight="10px";
-  modeT.innerHTML=`<button data-tfm="process" class="${tfMode=='process'?'active':''}" aria-pressed="${tfMode=='process'}">By process</button><button data-tfm="split" class="${tfMode=='split'?'active':''}" aria-pressed="${tfMode=='split'}">Approved vs Declined</button>`;
-  modeT.querySelectorAll("button").forEach(b=>b.onclick=()=>{ tfMode=b.dataset.tfm; renderTotalFraudLegend(); drawTotalFraud(); });
+  const _hsOk=famHas("hsAvail");
+  modeT.innerHTML=`<button data-tfm="process" class="${tfMode=='process'?'active':''}" aria-pressed="${tfMode=='process'}">By process</button><button data-tfm="split" class="${tfMode=='split'?'active':''}" aria-pressed="${tfMode=='split'}">Approved vs Declined</button><button data-tfm="hssplit" class="${tfMode=='hssplit'?'active':''}" aria-pressed="${tfMode=='hssplit'}"${_hsOk?"":` disabled style="opacity:.4;cursor:not-allowed" title="High-Spender breakdown not provided by the pipeline for this family"`}>HS vs Non-HS</button>`;
+  modeT.querySelectorAll("button").forEach(b=>b.onclick=()=>{ if(b.disabled) return; tfMode=b.dataset.tfm; renderTotalFraudLegend(); drawTotalFraud(); });
   wrap.appendChild(modeT);
   const allOn = tfVisible.size===PROCESSES.length;
   const allBtn=document.createElement("button");
@@ -2466,8 +2543,54 @@ function drawTotalFraudSplit(){
     ]; } });
   renderTotalFraudSparks();
 }
+// §01.3 HS-vs-Non-HS split: total split by High-Spender share. The split IS the HS breakdown, so it
+// deliberately ignores the HS segment filter (hsSeg) — showing the full HS vs Non-HS composition.
+function tfHsSeries(){
+  const total=Array(NDAYS).fill(0), hs=Array(NDAYS).fill(0), nonhs=Array(NDAYS).fill(0);
+  PROCESSES.forEach(p=>{ if(!tfVisible.has(p.id))return;
+    const tot=(DLR_HIST[p.id]||[]).slice(-NDAYS);
+    for(let i=0;i<NDAYS;i++){ const t=tot[i]||0; const sh=(HSSHARE[p.id]&&HSSHARE[p.id][i]!=null)?HSSHARE[p.id][i]:0; const h=t*sh;
+      total[i]+=t; hs[i]+=h; nonhs[i]+=(t-h); }
+  });
+  return {total,hs,nonhs};
+}
+function drawTotalFraudHsSplit(){
+  const W=920,H=360,pl=54,pr=16,pt=16,pb=30; const iw=W-pl-pr, ih=H-pt-pb;
+  const x=i=>pl+iw*i/(NDAYS-1);
+  const el=$("#totalFraudSvg"); if(!el) return;
+  const {total,hs,nonhs}=tfHsSeries();
+  let max=Math.max(...total,1)*1.1; const y=v=>pt+ih-(v/max*ih);
+  let svg="<title>Total fraud $ split into High-Spender and Non-HS</title>";
+  for(let g=0;g<=4;g++){const v=max*g/4,yy=y(v);svg+=`<line class="grid-line" x1="${pl}" y1="${yy}" x2="${W-pr}" y2="${yy}"/><text class="axis-lbl" x="${pl-6}" y="${yy+3}" text-anchor="end">${fmt$(v)}</text>`;}
+  { const _pd=procDates(); for(let i=0;i<NDAYS;i+=7) svg+=`<text class="axis-lbl" x="${x(i)}" y="${H-8}" text-anchor="middle">${_pd[i]||""}</text>`; }
+  const wx=x(NDAYS-WIN); svg+=`<line class="window-line" x1="${wx}" y1="${pt}" x2="${wx}" y2="${pt+ih}"/><text class="window-lbl" x="${wx+4}" y="${pt+10}">recent 15d ▸</text>`;
+  if(tfVisible.size===0){ svg+=`<text x="${pl+iw/2}" y="${pt+ih/2}" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--sans)" font-size="13" font-weight="600">No processes selected — click a chip above</text>`; el.innerHTML=svg; return; }
+  const zeros=Array(NDAYS).fill(0);
+  const area=(lo,hi)=>{ let d="M "+x(0).toFixed(1)+" "+y(hi[0]).toFixed(1); for(let i=1;i<NDAYS;i++) d+=" L "+x(i).toFixed(1)+" "+y(hi[i]).toFixed(1); for(let i=NDAYS-1;i>=0;i--) d+=" L "+x(i).toFixed(1)+" "+y(lo[i]).toFixed(1); return d+" Z"; };
+  const line=(arr,color,w)=>{ const d=arr.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)).join(" "); return `<path d="${d}" fill="none" stroke="${color}" stroke-width="${w}"/>`; };
+  // High-Spender anchored to axis (bottom); Non-HS stacked to the total top edge.
+  svg+=`<path d="${area(hs,total)}" fill="var(--tf-nonhs)" opacity="0.28"/>`;
+  svg+=`<path d="${area(zeros,hs)}" fill="var(--tf-hs)" opacity="0.42"/>`;
+  svg+=line(total,"var(--tf-nonhs)",1.6);
+  svg+=line(hs,"var(--tf-hs)",1.8);
+  svg+=`<circle cx="${x(NDAYS-1)}" cy="${y(total[NDAYS-1])}" r="2.8" fill="var(--tf-nonhs)"/><circle cx="${x(NDAYS-1)}" cy="${y(hs[NDAYS-1])}" r="2.8" fill="var(--tf-hs)"/>`;
+  svg+=`<g font-family="var(--sans)" font-size="10.5" font-weight="700">
+    <rect x="${pl+8}" y="${pt+4}" width="10" height="10" rx="2" fill="var(--tf-hs)" opacity="0.7"/><text x="${pl+22}" y="${pt+13}" fill="var(--ink-dim)">High Spender</text>
+    <rect x="${pl+130}" y="${pt+4}" width="10" height="10" rx="2" fill="var(--tf-nonhs)" opacity="0.6"/><text x="${pl+144}" y="${pt+13}" fill="var(--ink-dim)">Non-HS</text>
+  </g>`;
+  el.innerHTML=svg;
+  setupSvgHover("totalFraudSvg",{W,pl,iw,pt,ih,n:NDAYS, dateAt:i=>procDates()[i],
+    rowsAt:i=>{ const shr=total[i]?(hs[i]/total[i]*100):0; return [
+      {label:"Total fraud $", color:"var(--ink-dim)", value:fmt$(total[i]), y:y(total[i])},
+      {divider:true},
+      {label:"Non-HS", color:"var(--tf-nonhs)", value:fmt$(nonhs[i]), y:null},
+      {label:"High Spender", color:"var(--tf-hs)", value:`${fmt$(hs[i])} · ${shr.toFixed(0)}% of total`, y:y(hs[i])}
+    ]; } });
+  renderTotalFraudSparks();
+}
 function drawTotalFraud(){
   if(tfMode==="split"){ drawTotalFraudSplit(); return; }
+  if(tfMode==="hssplit"){ drawTotalFraudHsSplit(); return; }
   const W=920,H=360,pl=54,pr=16,pt=16,pb=30; const iw=W-pl-pr, ih=H-pt-pb;
   const x=i=>pl+iw*i/(NDAYS-1);
   const series={}; let max=0;
@@ -2491,7 +2614,7 @@ function renderTotalFraudSparks(){
   const col=$("#totalFraudSpark"); if(!col) return; col.innerHTML="";
   const hdr=document.createElement("div"); hdr.className="spark-hdr";
   hdr.style.cssText="font-family:var(--mono);font-size:9px;color:var(--ink-faint);display:grid;grid-template-columns:1fr 60px 46px 46px;gap:7px;padding:0 7px 2px;text-transform:uppercase;letter-spacing:.04em";
-  hdr.innerHTML="<span>Process"+filtBadgeHtml(false)+"</span><span style='text-align:center'>15d spark</span><span style='text-align:right'>DoD</span><span style='text-align:right'>\u0394%</span>";
+  hdr.innerHTML="<span style='white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>Process"+filtBadgeHtml(false)+"</span><span style='text-align:center'>15d spark</span><span style='text-align:right'>DoD</span><span style='text-align:right'>\u0394%</span>";
   col.appendChild(hdr);
   PROCESSES.forEach(p=>{
     const s=(DLR_HIST[p.id]||[]).slice(-NDAYS).map((v,i)=>v*hsMul(p.id,i));
@@ -3151,7 +3274,7 @@ renderTotalFraudLegend(); drawTotalFraud();
 drawCommandCenter(); renderVerdict(); renderAlerts();
 document.querySelectorAll("#ccTabs .tab-btn").forEach(b => b.onclick = () => setProcFam(b.dataset.ccfam, b));
 document.querySelectorAll(".pf-tabs .tab-btn").forEach(b => b.onclick = () => setProcFam(b.dataset.pf, b));
-document.querySelectorAll("#hsSegToggle button").forEach(b => b.onclick = () => { hsSeg = b.dataset.hs; document.querySelectorAll("#hsSegToggle button").forEach(x => { x.classList.toggle("active", x === b); x.setAttribute("aria-pressed", x === b); }); drawTrend(); drawTotalFraud(); updateFilterBadges(); });
+document.querySelectorAll("[data-hs]").forEach(b => b.onclick = () => setHsSeg(b.dataset.hs));
 $("#ddModeToggle").querySelectorAll("button").forEach(b=>b.onclick=()=>setDDMode(b.dataset.mode));
 setDDMode("total"); renderDDTotal();
 updateVolUnitNote(); renderVolumeTable(); renderVolumeCharts();
@@ -3227,6 +3350,15 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeVolMo
 
 // Item 1: Global status pill in masthead
 // Masthead dates: injected meta if present, else stamp today's date at render.
+// One-click back-to-top: show the button after scrolling down, smooth-scroll to top on click.
+(function backToTop(){
+  const btn=document.getElementById("backToTop");
+  if(!btn) return;
+  const onScroll=()=>btn.classList.toggle("show", window.scrollY>400);
+  window.addEventListener("scroll", onScroll, {passive:true});
+  btn.onclick=()=>window.scrollTo({top:0, behavior:"smooth"});
+  onScroll();
+})();
 (function mastheadDates(){
   const m = (typeof INJECTED_DATA!=='undefined' && INJECTED_DATA && INJECTED_DATA.meta) || {};
   const z = n => String(n).padStart(2,'0');
