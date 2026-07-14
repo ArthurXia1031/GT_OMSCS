@@ -46,3 +46,7 @@ select * from merch_all
 union all
 select * from merch_src
 order by srce, fraud_dlr desc;
+
+
+-- findstr /c:"injFam.merchants" cmpt_report_pro_vv.html
+-- findstr /c:"\"merchants\"" cmpt_report_test_0713.html
