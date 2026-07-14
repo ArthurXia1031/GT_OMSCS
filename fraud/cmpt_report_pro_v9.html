@@ -325,6 +325,32 @@
   .bar-seg{height:100%}
   .bar-fill{height:100%;border-radius:6px}
   .bar-val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink);text-align:right}
+  /* §02.1 compact merchant table — scan-first, single color encoding ($ bar), rate as its own column */
+  .dd-table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .dd-table th{padding:7px 10px;border-bottom:1.5px solid var(--line);font-family:var(--mono);color:var(--ink-faint);font-weight:700;font-size:10px;letter-spacing:0.07em;text-transform:uppercase;text-align:right;user-select:none;white-space:nowrap}
+  .dd-table th:first-child{text-align:left}
+  .dd-table th[data-k]{cursor:pointer}
+  .dd-table th[data-k]:hover{color:var(--ink)}
+  .dd-table th[data-k]::after{content:"⇅";margin-left:4px;font-size:8px;opacity:.35}
+  .dd-table th.sort-asc::after{content:"▲";opacity:1;color:var(--accent)}
+  .dd-table th.sort-desc::after{content:"▼";opacity:1;color:var(--accent)}
+  .dd-table td{padding:6px 10px;border-bottom:1px solid var(--line);font-family:var(--mono);text-align:right;white-space:nowrap}
+  .dd-table td:first-child{text-align:left;max-width:210px;overflow:hidden;text-overflow:ellipsis}
+  .dd-table tbody tr{cursor:pointer;transition:background .1s}
+  .dd-table tbody tr:hover{background:var(--panel-2)}
+  .dd-table tbody tr.sel{background:var(--panel-2);box-shadow:inset 2.5px 0 0 var(--accent)}
+  .dd-mname{font-weight:700;color:var(--ink)}
+  .dd-mid{font-size:10px;color:var(--ink-faint);margin-left:6px}
+  .dd-dlr{font-weight:700;color:var(--ink)}
+  .dd-bar{width:92px;height:5px;background:var(--panel-2);border-radius:3px;overflow:hidden;display:inline-flex;vertical-align:middle}
+  .dd-bar i{height:100%;display:block}
+  .dd-rate{font-weight:700}
+  .dd-rate.hi{color:var(--bad)} .dd-rate.md{color:var(--warn)} .dd-rate.lo{color:var(--ink-faint);font-weight:600}
+  .dd-grp-head{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink);margin:16px 0 4px}
+  .dd-grp-head:first-child{margin-top:0}
+  .dd-grp-head .ptot{margin-left:auto;color:var(--ink-dim);font-weight:600;font-size:11px}
+  .dd-more{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--accent);background:none;border:0;cursor:pointer;padding:5px 10px}
+  .dd-more:hover{text-decoration:underline}
   .dd-detail h4{margin:0 0 6px;font-size:14px;font-weight:700;font-family:var(--mono);letter-spacing:-0.015em}
   .dd-detail .mname{color:var(--accent)}
   .dd-hint{color:var(--ink-faint);font-size:12px;font-family:var(--mono);padding:40px 0;text-align:center;font-weight:550}
@@ -1154,7 +1180,13 @@ function buildFamilyFromInjected(injFam, prevMerchants) {
         mcc: m.mcc != null ? String(m.mcc) : "—",
         proc: m.proc || "All",
         tot: m.tot || 0, frd: m.frd || 0, fdlr: m.fdlr || 0,
-        rate: +(m.rate || 0), reason: m.reason || null }))
+        rate: +(m.rate || 0), reason: m.reason || null,
+        // optional approve/decline splits + txn base (present only when the SQL supplies them)
+        fdlrApr: m.fdlrApr != null ? m.fdlrApr : null,
+        fdlrDcl: m.fdlrDcl != null ? m.fdlrDcl : null,
+        frdApr: m.frdApr != null ? m.frdApr : null,
+        frdDcl: m.frdDcl != null ? m.frdDcl : null,
+        totTran: m.totTran != null ? m.totTran : null }))
     : (prevMerchants || []);
   return { procs, trend, dollarStats, dlrHist, merchants, trendAcct, hsShare, v15Share,
            hsAvail: hasHs, v15Avail: hasV15, acctAvail: hasTierFrd };
@@ -1693,7 +1725,24 @@ function renderSparks(){
 
 /* ---------- MODULE B: DRILLDOWN (by total + by process) ---------- */
 let ddMode="total", ddSel=null;
+let ddSort={k:"fdlr",dir:-1};   // §02.1 table sort: fdlr | rate | frd
 const rateColor=r=> r>=10?"var(--bad)": r>=5?"var(--warn)":"var(--accent)";
+const rateCls=r=> r>=10?"hi": r>=5?"md":"lo";
+// One merchant row for the compact table. Bar length ∝ fdlr/max (single slate hue — rate is its own
+// column, so length and color no longer fight). With real approved/declined splits the bar gets two
+// segments of the same hue: deep = approved, light = declined.
+function ddRowHtml(m, max){
+  const hasSplit = m.fdlrApr!=null && m.fdlrDcl!=null;
+  const w=(m.fdlr/max*100);
+  const bar = hasSplit
+    ? `<span class="dd-bar"><i style="width:${(w*(m.fdlr?m.fdlrApr/m.fdlr:0)).toFixed(1)}%;background:var(--tf-hs);opacity:.9"></i><i style="width:${(w*(m.fdlr?m.fdlrDcl/m.fdlr:0)).toFixed(1)}%;background:var(--tf-hs);opacity:.35"></i></span>`
+    : `<span class="dd-bar"><i style="width:${w.toFixed(1)}%;background:var(--tf-hs);opacity:.75"></i></span>`;
+  return `<td><span class="dd-mname">${m.name}</span><span class="dd-mid" title="Merchant identifier">${getMid(m)}</span></td>
+    <td class="dd-dlr">${fmt$(m.fdlr)}</td>
+    <td>${bar}</td>
+    <td class="dd-rate ${rateCls(m.rate)}">${m.rate}%</td>
+    <td>${(m.frd||0).toLocaleString()}</td>`;
+}
 function renderDDTotal(){
   const wrap=$("#ddBars"); wrap.innerHTML="";
   
@@ -1741,10 +1790,11 @@ function renderDDTotal(){
     list = list.filter(m => m.proc === "All");
   }
   
-  // 3. Render bars
-  const barsContainer = document.createElement("div");
+  // 3. Render as a compact sortable table (scan-first; the old fat colored bars encoded $ in
+  // length and rate in color simultaneously — the two fought. Now: slate bar = $, rate = column.)
+  list.sort((a,b)=>{ const av=a[ddSort.k]||0, bv=b[ddSort.k]||0; return (av-bv)*ddSort.dir; });
   const max=Math.max(...list.map(m=>m.fdlr)) || 1;
-  
+
   if (list.length === 0) {
     const empty = document.createElement("div");
     empty.className = "dd-hint";
@@ -1753,18 +1803,33 @@ function renderDDTotal(){
     ddSel = null;
     $("#ddDetail").innerHTML = '<div class="dd-hint">No merchant to show for this filter.</div>';
   } else {
-    // Default the right pane to the top-ranked merchant when nothing valid is selected,
+    // Default the right pane to the top-$ merchant when nothing valid is selected,
     // so the detail never sits on the "click a merchant" hint.
-    if (!ddSel || !list.some(m => m.name === ddSel)) ddSel = list[0].name;
-    list.forEach(m=>{
-      const row=document.createElement("div"); row.className="bar-row"+(ddSel===m.name?" sel":"");
-      row.innerHTML=`<span class="bar-name">${m.name} <span style="font-size:10px;color:var(--ink-faint);font-style:italic;opacity:.75" title=\"Merchant identifier\">(${getMid(m)})</span></span>
-        <div class="bar-track"><div class="bar-fill" style="width:${(m.fdlr/max*100).toFixed(1)}%;background:${rateColor(m.rate)}"></div></div>
-        <span class="bar-val">${fmt$(m.fdlr)}</span>`;
-      row.onclick=()=>{ ddSel=m.name; renderDDTotal(); renderDDDetail(m); };
-      barsContainer.appendChild(row);
+    const topByDlr = list.slice().sort((a,b)=>b.fdlr-a.fdlr)[0];
+    if (!ddSel || !list.some(m => m.name === ddSel)) ddSel = topByDlr.name;
+    const tbl=document.createElement("table"); tbl.className="dd-table";
+    const sortCls=k=> ddSort.k===k ? (ddSort.dir===1?"sort-asc":"sort-desc") : "";
+    tbl.innerHTML=`<thead><tr>
+      <th>Merchant</th>
+      <th data-k="fdlr" class="${sortCls('fdlr')}">Fraud $</th>
+      <th></th>
+      <th data-k="rate" class="${sortCls('rate')}">Rate</th>
+      <th data-k="frd" class="${sortCls('frd')}">Frd Accts</th>
+    </tr></thead>`;
+    tbl.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{
+      const k=th.dataset.k;
+      if(ddSort.k===k) ddSort.dir*=-1; else ddSort={k, dir:-1};
+      renderDDTotal();
     });
-    wrap.appendChild(barsContainer);
+    const tb=document.createElement("tbody");
+    list.forEach(m=>{
+      const tr=document.createElement("tr"); if(ddSel===m.name) tr.className="sel";
+      tr.innerHTML=ddRowHtml(m, max);
+      tr.onclick=()=>{ ddSel=m.name; renderDDTotal(); };
+      tb.appendChild(tr);
+    });
+    tbl.appendChild(tb);
+    wrap.appendChild(tbl);
     renderDDDetail(list.find(m => m.name === ddSel));
   }
 }
@@ -1779,22 +1844,31 @@ function renderDDDetail(m){
   const acctFraudRate = m.tot ? (m.frd / m.tot * 100).toFixed(2) + "%" : "—";
   const merchAFPR = m.frd ? (m.tot / m.frd).toFixed(1) : "—";
   const merchTFPR = m.frd ? ((m.tot - m.frd) / m.frd).toFixed(1) : "—";
+  // Approved/Declined split under the headline $ when the SQL supplies it (fdlr = apr + dcl).
+  const hasSplit = m.fdlrApr!=null && m.fdlrDcl!=null;
+  const splitLine = hasSplit
+    ? `<div style="font-family:var(--mono);font-size:10px;color:var(--ink-dim);margin-top:3px">Approved <b style="color:var(--tf-approved)">${fmt$(m.fdlrApr)}</b> · Declined <b style="color:var(--tf-declined)">${fmt$(m.fdlrDcl)}</b></div>`
+    : "";
+  // Ratio metrics are noise on tiny merchants — grey them out below 20 txns in the window.
+  const lowBase = m.totTran!=null && m.totTran<20;
+  const dim = lowBase ? ' style="color:var(--ink-faint)" title="low base — fewer than 20 txns in window"' : "";
+  const lowNote = lowBase ? `<tr><td colspan="2" style="text-align:left;color:var(--ink-faint);font-size:10.5px">low base — ratios unreliable (&lt;20 txns in window)</td></tr>` : "";
 
   $("#ddDetail").innerHTML=`
     <h4 class="mname">${m.name}</h4>
     <div style="font-family:var(--mono);font-size:10.5px;color:var(--ink-dim)">MCC ${m.mcc} · ${getMid(m)} · process: ${procLabel}</div>
     <div class="stat-grid">
-      <div class="stat"><div class="l">Fraud $ (Leakage)</div><div class="v" style="color:var(--bad)">${fmt$(m.fdlr)}</div></div>
+      <div class="stat"><div class="l">Fraud $${hasSplit?"":" (Leakage)"}</div><div class="v" style="color:var(--bad)">${fmt$(m.fdlr)}</div>${splitLine}</div>
       <div class="stat"><div class="l">Txn Fraud Rate</div><div class="v" style="color:${m.rate>=10?'var(--bad)':'var(--warn)'}">${m.rate}%</div></div>
-      <div class="stat"><div class="l">Total Acct Declined</div><div class="v">${m.tot.toLocaleString()}</div></div>
-      <div class="stat"><div class="l">Fraud Acct Blocked</div><div class="v">${m.frd.toLocaleString()}</div></div>
+      <div class="stat"><div class="l">Accounts</div><div class="v">${m.tot.toLocaleString()}</div></div>
+      <div class="stat"><div class="l">Fraud Accounts</div><div class="v">${m.frd.toLocaleString()}</div></div>
     </div>
     <table><thead><tr><th>Merchant Metric</th><th>Value</th></tr></thead><tbody>
-      ${reasonRow}
-      <tr><td>Account Fraud Rate (AFR)</td><td class="num">${acctFraudRate}</td></tr>
-      <tr><td>Merchant AFPR (tot/frd)</td><td class="num" style="font-weight:700;color:var(--ink)">${merchAFPR}</td></tr>
-      <tr><td>Merchant TFPR (FPR Ratio)</td><td class="num" style="font-weight:700;color:var(--accent)">${merchTFPR} : 1</td></tr>
-      <tr><td>Avg Fraud Leakage / acct</td><td class="num">${m.frd?fmt$(Math.round(m.fdlr/m.frd)):"—"}</td></tr>
+      ${reasonRow}${lowNote}
+      <tr><td>Account Fraud Rate (AFR)</td><td class="num"${dim}>${acctFraudRate}</td></tr>
+      <tr><td>Merchant AFPR (tot/frd)</td><td class="num"${dim || ' style="font-weight:700;color:var(--ink)"'}>${merchAFPR}</td></tr>
+      <tr><td>Merchant TFPR (FPR Ratio)</td><td class="num"${dim || ' style="font-weight:700;color:var(--accent)"'}>${merchTFPR} : 1</td></tr>
+      <tr><td>Avg Fraud $ / acct</td><td class="num"${dim}>${m.frd?fmt$(Math.round(m.fdlr/m.frd)):"—"}</td></tr>
     </tbody></table>`;
 }
 function renderDDProcess(){
@@ -1810,40 +1884,39 @@ function renderDDProcess(){
   
   const globalMax=Math.max(...MERCHANTS.filter(m=>m.proc!=="All").map(m=>m.fdlr), 1);
   
+  // Two-column grid of process sections, each the same compact table as "By Total $":
+  // header = process + group $ + merchant count; top-5 rows, rest behind "+N more".
+  host.style.cssText="display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:8px 28px;align-items:start";
   procRank.forEach(g=>{
     const p=PROCESSES.find(x=>x.id===g.pid);
-    const grp=document.createElement("div"); 
+    const grp=document.createElement("div");
     grp.className="proc-group";
     grp.id = `proc-group-${g.pid}`;
-    
-    const top3 = g.merchants.slice(0, 3);
-    const remaining = g.merchants.slice(3);
-    
-    let barsTop3 = top3.map(m=>`
-      <div class="bar-row" onclick="inspectMerchant('${g.pid}', '${m.name.replace(/'/g, "\'")}')">
-        <span class="bar-name">${m.name} <span style="font-size:10px;color:var(--ink-faint);font-style:italic;opacity:.75" title=\"Merchant identifier\">(${getMid(m)})</span></span>
-        <div class="bar-track"><div class="bar-fill" style="width:${(m.fdlr/globalMax*100).toFixed(1)}%;background:${rateColor(m.rate)}"></div></div>
-        <span class="bar-val">${fmt$(m.fdlr)}</span>
-      </div>`).join("");
-      
-    let barsRemaining = "";
-    let accordionBtn = "";
-    
-    if (remaining.length > 0) {
-      barsRemaining = `<div class="proc-accordion" id="acc-${g.pid}" style="max-height:0;overflow:hidden;transition:max-height .25s ease;">` + remaining.map(m=>`
-        <div class="bar-row" onclick="inspectMerchant('${g.pid}', '${m.name.replace(/'/g, "\'")}')">
-          <span class="bar-name">${m.name} <span style="font-size:10px;color:var(--ink-faint);font-style:italic;opacity:.75" title=\"Merchant identifier\">(${getMid(m)})</span></span>
-          <div class="bar-track"><div class="bar-fill" style="width:${(m.fdlr/globalMax*100).toFixed(1)}%;background:${rateColor(m.rate)}"></div></div>
-          <span class="bar-val">${fmt$(m.fdlr)}</span>
-        </div>`).join("") + `</div>`;
-        
-      accordionBtn = `<button class="action-btn" style="margin-left: 172px; margin-top: 6px; font-size: 9.5px; padding: 4px 10px;" id="btn-acc-${g.pid}" onclick="toggleProcAccordion('${g.pid}')">Show ${remaining.length} more merchants</button>`;
+
+    const head=document.createElement("div"); head.className="dd-grp-head";
+    head.innerHTML=`<span class="pdot" style="width:9px;height:9px;border-radius:50%;background:${p?p.color:'var(--ink-faint)'}"></span>${p?p.short:g.pid}<span class="ptot">${fmt$(g.tot)} · ${g.merchants.length} merch</span>`;
+    grp.appendChild(head);
+
+    const tbl=document.createElement("table"); tbl.className="dd-table";
+    const tb=document.createElement("tbody");
+    g.merchants.forEach((m,i)=>{
+      const tr=document.createElement("tr");
+      if(i>=5){ tr.style.display="none"; tr.dataset.extra="1"; }
+      tr.innerHTML=ddRowHtml(m, globalMax);
+      tr.onclick=()=>inspectMerchant(g.pid, m.name);
+      tb.appendChild(tr);
+    });
+    tbl.appendChild(tb);
+    grp.appendChild(tbl);
+
+    if(g.merchants.length>5){
+      const more=document.createElement("button"); more.className="dd-more";
+      more.textContent=`+${g.merchants.length-5} more`;
+      more.onclick=()=>{ const open=more.dataset.open==="1";
+        tb.querySelectorAll('tr[data-extra]').forEach(tr=>tr.style.display=open?"none":"");
+        more.dataset.open=open?"0":"1"; more.textContent=open?`+${g.merchants.length-5} more`:"show less"; };
+      grp.appendChild(more);
     }
-    
-    grp.innerHTML=`<h5><span class="pdot" style="background:${p?p.color:'var(--ink-faint)'}"></span>${p?p.short:g.pid}<span class="ptot">${fmt$(g.tot)} · ${g.merchants.length} merch</span></h5>
-      ${barsTop3}
-      ${barsRemaining}
-      ${accordionBtn}`;
     host.appendChild(grp);
   });
 }
