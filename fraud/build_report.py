@@ -308,17 +308,41 @@ def snowflake_connect(creds_path=None):
     return con
 
 
-def fetch_cpp_volume(conn, sql=CPP_VOLUME_SQL):
-    """Run the CPP volume query → list of {SOURCE, BATCH_DT, TOT_ACCT} dicts.
+def _sql_body(sql):
+    """SQL text with comments stripped — used only to sanity-check a pasted slot."""
+    body = re.sub(r"--[^\n]*", "", sql)
+    body = re.sub(r"/\*.*?\*/", "", body, flags=re.S)
+    return body.strip()
+
+
+def sql_ready(sql):
+    """True when a slot holds real SQL: no placeholder token, and not empty/comment-only."""
+    if "<YOUR_" in sql or "<PASTE" in sql:
+        return False
+    return bool(_sql_body(sql).strip(";").strip())
+
+
+def fetch_cpp_volume(conn, sql=CPP_VOLUME_SQL, label="query"):
+    """Run one result-returning SELECT → list of {COL: value} dicts.
     Uses the cursor directly (no pandas dependency); swap in pd.read_sql if you prefer."""
     # cursor.execute() runs ONE statement. Strip trailing ';' / blank lines so a copy-pasted
     # query that ends in a semicolon doesn't trip "statement count 2 != 1".
     cleaned = sql.strip()
     while cleaned.endswith(";"):
         cleaned = cleaned[:-1].strip()
+    # A semicolon left mid-text means the slot holds MULTIPLE statements (use/create/junk line +
+    # the select). Catch it here with a readable message instead of a connector error.
+    if ";" in _sql_body(cleaned):
+        sys.exit("ERROR: %s: the SQL slot contains multiple statements (found an interior ';').\n"
+                 "  Paste ONE plain SELECT per slot — no 'use ...;', no 'create table ...;', no stray lines." % label)
     cur = conn.cursor()
     try:
         cur.execute(cleaned)
+        if cur.description is None:
+            # execute succeeded but produced no result set → the statement wasn't a SELECT
+            sys.exit("ERROR: %s: statement returned no result set (cur.description is None).\n"
+                     "  The slot must hold a single result-returning SELECT. It starts with:\n"
+                     "  %s" % (label, cleaned[:160].replace("\n", " ")))
         cols = [c[0].upper() for c in cur.description]
         return [dict(zip(cols, row)) for row in cur.fetchall()]
     finally:
@@ -638,10 +662,10 @@ def main():
         conn = snowflake_connect(args.creds)
         try:
             for group, sql in VOLUME_SQL.items():
-                if "<YOUR_" in sql:                       # unfilled placeholder → skip
+                if not sql_ready(sql):                    # placeholder / empty / comment-only → skip
                     print("  skip %s: SQL not filled in" % group)
                     continue
-                rows = fetch_cpp_volume(conn, sql)
+                rows = fetch_cpp_volume(conn, sql, label="%s volume SQL" % group)
                 vol = build_volume_payload(rows, group=group)
                 if vol:
                     payload.setdefault("volume", {}).update(vol)
@@ -650,12 +674,12 @@ def main():
                     print("  WARNING: %s volume query returned no rows" % group)
             # Q2 — process daily metrics, one SQL per family (§00–§02, §05)
             for fam, sql in PROCESS_SQL.items():
-                if "<YOUR_" in sql or "<PASTE" in sql:        # unfilled placeholder → skip
+                if not sql_ready(sql):                        # placeholder / empty / comment-only → skip
                     print("  skip %s families: SQL not filled in" % fam)
                     continue
                 # roll=1: the SQL already emits per-as-of-day trailing-15d windowed values
                 # (distinct accts deduped + summed $), so Python only aligns — no second window.
-                fp = build_family_payload(fetch_cpp_volume(conn, sql), fam, roll=1)
+                fp = build_family_payload(fetch_cpp_volume(conn, sql, label="%s process SQL" % fam), fam, roll=1)
                 if fp:
                     payload.setdefault("families", {}).update(fp)
                     print("  fetched %s process metrics: %d sources x %d days" % (fam, len(fp[fam]["procs"]), len(fp[fam]["dates"])))
@@ -664,10 +688,10 @@ def main():
             # Q3 — merchant drill-down snapshot (§02.1). Attached onto the family dict; the template
             # only swaps a family in when procs exist, so merchants without Q2 are ignored there.
             for fam, sql in MERCHANT_SQL.items():
-                if "<YOUR_" in sql or "<PASTE" in sql:            # unfilled placeholder → skip
+                if not sql_ready(sql):                            # placeholder / empty / comment-only → skip
                     print("  skip %s merchants: SQL not filled in" % fam)
                     continue
-                merch = build_merchant_payload(fetch_cpp_volume(conn, sql), fam)
+                merch = build_merchant_payload(fetch_cpp_volume(conn, sql, label="%s merchant SQL" % fam), fam)
                 if merch:
                     fam_d = payload.setdefault("families", {}).setdefault(fam, {})
                     fam_d["merchants"] = merch
