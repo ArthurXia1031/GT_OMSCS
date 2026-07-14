@@ -50,3 +50,5 @@ order by srce, fraud_dlr desc;
 
 -- findstr /c:"injFam.merchants" cmpt_report_pro_vv.html
 -- findstr /c:"\"merchants\"" cmpt_report_test_0713.html
+-- Select-String -Path .\cmpt_report_test_0713.html -Pattern '"merchants":' -SimpleMatch
+
