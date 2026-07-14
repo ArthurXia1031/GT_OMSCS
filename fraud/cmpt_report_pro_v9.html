@@ -1334,9 +1334,12 @@ function mkFamMerchants(defs, prefix, seed0, hotIds) {
   out[0].proc = hotIds[0];
   return out;
 }
-FAMS.testing.merchants = TESTING_MERCHANTS;
-FAMS.cpp.merchants     = mkFamMerchants(CPP_DEFS,  "CPP",  901, ["cpp_proc_02", "cpp_proc_07", "cpp_proc_12"]);
-FAMS.vendor.merchants  = mkFamMerchants(VEND_DEFS, "VEND", 903, ["vendor_src_04", "vendor_src_09"]);
+// Synthetic merchants are a FALLBACK only: the INJECTED_DATA swap above runs first and may have
+// attached REAL merchants (Q3) to a family — never clobber those. (An unconditional assignment
+// here silently overwrote injected merchants with demo data.)
+if (!FAMS.testing.merchants || !FAMS.testing.merchants.length) FAMS.testing.merchants = TESTING_MERCHANTS;
+if (!FAMS.cpp.merchants     || !FAMS.cpp.merchants.length)     FAMS.cpp.merchants     = mkFamMerchants(CPP_DEFS,  "CPP",  901, ["cpp_proc_02", "cpp_proc_07", "cpp_proc_12"]);
+if (!FAMS.vendor.merchants  || !FAMS.vendor.merchants.length)  FAMS.vendor.merchants  = mkFamMerchants(VEND_DEFS, "VEND", 903, ["vendor_src_04", "vendor_src_09"]);
 let MERCHANTS = FAMS.testing.merchants;
 
 const $=s=>document.querySelector(s);
