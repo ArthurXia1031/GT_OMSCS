@@ -767,7 +767,7 @@
 <section>
   <div class="sec-head">
     <span class="sec-num">02.1</span>
-    <h2>Merchant Fraud Detail</h2>
+    <h2>Fraud Merchant Detail</h2>
     <span class="sub" id="ddSub">ranked by total fraud $</span>
   </div>
   <div class="panel">
@@ -780,6 +780,11 @@
       <div class="seg-toggle" id="ddModeToggle">
         <button data-mode="total" class="active">By Total $</button>
         <button data-mode="process">By Process</button>
+      </div>
+      <div class="seg-toggle" id="ddDlrToggle" role="group" aria-label="Fraud $ view">
+        <button data-ddv="all" class="active" aria-pressed="true">Total</button>
+        <button data-ddv="apr" aria-pressed="false">Approved</button>
+        <button data-ddv="dcl" aria-pressed="false">Declined</button>
       </div>
       <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint)" id="ddModeHint">bar color = txn fraud rate in window</span>
     </div>
@@ -1726,22 +1731,38 @@ function renderSparks(){
 /* ---------- MODULE B: DRILLDOWN (by total + by process) ---------- */
 let ddMode="total", ddSel=null;
 let ddSort={k:"fdlr",dir:-1};   // §02.1 table sort: fdlr | rate | frd
+let ddDlrView="all";            // §02.1 $ view: "all" (total) | "apr" (approved) | "dcl" (declined)
 const rateColor=r=> r>=10?"var(--bad)": r>=5?"var(--warn)":"var(--accent)";
 const rateCls=r=> r>=10?"hi": r>=5?"md":"lo";
+// View-aware accessors: ranking, bars and group totals all follow the selected $ view.
+const ddDlrOf=m=> ddDlrView==="apr" ? (m.fdlrApr||0) : ddDlrView==="dcl" ? (m.fdlrDcl||0) : (m.fdlr||0);
+const ddFrdOf=m=> ddDlrView==="apr" ? (m.frdApr!=null?m.frdApr:null) : ddDlrView==="dcl" ? (m.frdDcl!=null?m.frdDcl:null) : (m.frd||0);
+const ddHasSplit=()=> MERCHANTS.some(m=>m.fdlrApr!=null && m.fdlrDcl!=null);
+// Enable the Total/Approved/Declined toggle only when the pipeline supplied the split — never fabricate.
+function syncDdDlrAvailability(){
+  const ok=ddHasSplit();
+  document.querySelectorAll("#ddDlrToggle button").forEach(b=>{ b.disabled=!ok; b.style.opacity=ok?"":"0.4"; b.style.cursor=ok?"":"not-allowed"; b.title=ok?"":"approved/declined split not provided by the pipeline for this family"; });
+  if(!ok && ddDlrView!=="all"){ ddDlrView="all"; }
+  document.querySelectorAll("#ddDlrToggle button").forEach(b=>{ const on=b.dataset.ddv===ddDlrView; b.classList.toggle("active",on); b.setAttribute("aria-pressed",on); });
+}
 // One merchant row for the compact table. Bar length ∝ fdlr/max (single slate hue — rate is its own
 // column, so length and color no longer fight). With real approved/declined splits the bar gets two
 // segments of the same hue: deep = approved, light = declined.
 function ddRowHtml(m, max){
+  const v=ddDlrOf(m);
   const hasSplit = m.fdlrApr!=null && m.fdlrDcl!=null;
-  const w=(m.fdlr/max*100);
-  const bar = hasSplit
+  const w=(v/(max||1)*100);
+  // Total view + split data → two segments (deep = approved, light = declined);
+  // Approved / Declined views → one segment of that side only.
+  const bar = (ddDlrView==="all" && hasSplit)
     ? `<span class="dd-bar"><i style="width:${(w*(m.fdlr?m.fdlrApr/m.fdlr:0)).toFixed(1)}%;background:var(--tf-hs);opacity:.9"></i><i style="width:${(w*(m.fdlr?m.fdlrDcl/m.fdlr:0)).toFixed(1)}%;background:var(--tf-hs);opacity:.35"></i></span>`
-    : `<span class="dd-bar"><i style="width:${w.toFixed(1)}%;background:var(--tf-hs);opacity:.75"></i></span>`;
+    : `<span class="dd-bar"><i style="width:${w.toFixed(1)}%;background:var(--tf-hs);opacity:${ddDlrView==="dcl"?".45":".8"}"></i></span>`;
+  const frdV=ddFrdOf(m);
   return `<td><span class="dd-mname">${m.name}</span><span class="dd-mid" title="Merchant identifier">${getMid(m)}</span></td>
-    <td class="dd-dlr">${fmt$(m.fdlr)}</td>
+    <td class="dd-dlr">${fmt$(v)}</td>
     <td>${bar}</td>
     <td class="dd-rate ${rateCls(m.rate)}">${m.rate}%</td>
-    <td>${(m.frd||0).toLocaleString()}</td>`;
+    <td>${frdV==null?"—":frdV.toLocaleString()}</td>`;
 }
 function renderDDTotal(){
   const wrap=$("#ddBars"); wrap.innerHTML="";
@@ -1792,8 +1813,9 @@ function renderDDTotal(){
   
   // 3. Render as a compact sortable table (scan-first; the old fat colored bars encoded $ in
   // length and rate in color simultaneously — the two fought. Now: slate bar = $, rate = column.)
-  list.sort((a,b)=>{ const av=a[ddSort.k]||0, bv=b[ddSort.k]||0; return (av-bv)*ddSort.dir; });
-  const max=Math.max(...list.map(m=>m.fdlr)) || 1;
+  const sortVal=(m,k)=> k==="fdlr" ? ddDlrOf(m) : k==="frd" ? (ddFrdOf(m)||0) : (m[k]||0);
+  list.sort((a,b)=>(sortVal(a,ddSort.k)-sortVal(b,ddSort.k))*ddSort.dir);
+  const max=Math.max(...list.map(ddDlrOf)) || 1;
 
   if (list.length === 0) {
     const empty = document.createElement("div");
@@ -1805,13 +1827,14 @@ function renderDDTotal(){
   } else {
     // Default the right pane to the top-$ merchant when nothing valid is selected,
     // so the detail never sits on the "click a merchant" hint.
-    const topByDlr = list.slice().sort((a,b)=>b.fdlr-a.fdlr)[0];
+    const topByDlr = list.slice().sort((a,b)=>ddDlrOf(b)-ddDlrOf(a))[0];
     if (!ddSel || !list.some(m => m.name === ddSel)) ddSel = topByDlr.name;
     const tbl=document.createElement("table"); tbl.className="dd-table";
     const sortCls=k=> ddSort.k===k ? (ddSort.dir===1?"sort-asc":"sort-desc") : "";
+    const dlrHead = ddDlrView==="apr" ? "Approved $" : ddDlrView==="dcl" ? "Declined $" : "Fraud $";
     tbl.innerHTML=`<thead><tr>
       <th>Merchant</th>
-      <th data-k="fdlr" class="${sortCls('fdlr')}">Fraud $</th>
+      <th data-k="fdlr" class="${sortCls('fdlr')}">${dlrHead}</th>
       <th></th>
       <th data-k="rate" class="${sortCls('rate')}">Rate</th>
       <th data-k="frd" class="${sortCls('frd')}">Frd Accts</th>
@@ -1878,11 +1901,11 @@ function renderDDProcess(){
   MERCHANTS.forEach(m=>{ if(m.proc==="All") return; (groups[m.proc]=groups[m.proc]||[]).push(m); });
   
   const procRank=Object.keys(groups).map(pid=>{
-    const tot=groups[pid].reduce((s,m)=>s+m.fdlr,0); 
-    return {pid,tot,merchants:groups[pid].sort((a,b)=>b.fdlr-a.fdlr)};
+    const tot=groups[pid].reduce((s,m)=>s+ddDlrOf(m),0);
+    return {pid,tot,merchants:groups[pid].sort((a,b)=>ddDlrOf(b)-ddDlrOf(a))};
   }).sort((a,b)=>b.tot-a.tot);
-  
-  const globalMax=Math.max(...MERCHANTS.filter(m=>m.proc!=="All").map(m=>m.fdlr), 1);
+
+  const globalMax=Math.max(...MERCHANTS.filter(m=>m.proc!=="All").map(ddDlrOf), 1);
   
   // Two-column grid of process sections, each the same compact table as "By Total $":
   // header = process + group $ + merchant count; top-5 rows, rest behind "+N more".
@@ -2237,7 +2260,7 @@ function setProcFam(f, anchorEl) {
   // reset per-section view state to sensible defaults for the new family
   visible.clear();     PROCESSES.slice().sort((a, b) => b.fdlr - a.fdlr).slice(0, 3).forEach(p => visible.add(p.id));
   // afprVisible === tfVisible === visible (§01.2 AFPR + §01.3 Fraud $ share one selection) — reset above covers all three.
-  tierFocus = null; trendTierFilter = "all"; ddSel = null; ddProcessFilter = "all";
+  tierFocus = null; trendTierFilter = "all"; ddSel = null; ddProcessFilter = "all"; ddDlrView = "all";
   if (openDrawer) { openDrawer.remove(); openDrawer = null; }
   document.querySelectorAll(".pf-tabs .tab-btn").forEach(b => b.classList.toggle("active", b.dataset.pf === f));
   // keep §00.1 Command Center on the same family (all four sections now share one family state)
@@ -2249,6 +2272,7 @@ function setProcFam(f, anchorEl) {
   renderLegend(); drawTrend();
   renderTotalFraudLegend(); drawTotalFraud();
   syncFilterAvailability();
+  syncDdDlrAvailability();   // Total/Approved/Declined toggle: enabled only when this family has splits
   renderDDTotal();   // auto-opens the top-ranked merchant's detail on the right
   if (ddMode === "process") renderDDProcess();
   if (anchorEl && anchorTop != null) {
@@ -3380,6 +3404,14 @@ document.querySelectorAll("#ccTabs .tab-btn").forEach(b => b.onclick = () => set
 document.querySelectorAll(".pf-tabs .tab-btn").forEach(b => b.onclick = () => setProcFam(b.dataset.pf, b));
 document.querySelectorAll("[data-hs]").forEach(b => b.onclick = () => setHsSeg(b.dataset.hs));
 $("#ddModeToggle").querySelectorAll("button").forEach(b=>b.onclick=()=>setDDMode(b.dataset.mode));
+$("#ddDlrToggle").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  if(b.disabled) return;
+  ddDlrView=b.dataset.ddv;
+  document.querySelectorAll("#ddDlrToggle button").forEach(x=>{ const on=x===b; x.classList.toggle("active",on); x.setAttribute("aria-pressed",on); });
+  renderDDTotal();
+  if(ddMode==="process") renderDDProcess();
+});
+syncDdDlrAvailability();
 setDDMode("total"); renderDDTotal();
 updateVolUnitNote(); renderVolumeTable(); renderVolumeCharts();
 document.querySelectorAll("#volTabs .tab-btn").forEach(b => b.onclick = () => setVolGroup(b.dataset.volgrp));
