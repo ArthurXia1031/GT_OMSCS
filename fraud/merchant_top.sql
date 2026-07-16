@@ -58,3 +58,33 @@ select * from merch_all
 union all
 select * from merch_src
 order by srce, fraud_dlr desc;
+
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+
+, sum(case when fraud_tran_ind = 1 then tran_amt else 0 end) as acct_fraud_dlr
+, sum(case when fraud_tran_ind = 1 and hs = 'Y' then tran_amt else 0 end) as acct_fraud_dlr_hs
+, sum(case when fraud_tran_ind = 1
+           and datediff(minute, auth_tms, v_a_trx_lastverified_tms) >= 0
+           and datediff(minute, auth_tms, v_a_trx_lastverified_tms) <= 15
+      then tran_amt else 0 end) as acct_fraud_dlr_v15
+
+
+
+, sum(case when f.acct_fraud = 1 and date(f.fraud_stat_dt) >= a.as_of then 0
+           when f.acct_fraud = 1 then f.acct_fraud_dlr_hs
+           else 0 end) as fraud_dlr_hs
+
+
+, sum(case when c.acct_fraud = 1 and date(c.fraud_stat_dt) >= a.as_of then 0
+           when c.acct_fraud = 1 then c.acct_fraud_dlr_v15
+           else 0 end) as fraud_dlr_v15
+
+
+-- All 行的 select 加:
+,coalesce(fraud_dlr_hs, 0)  as FRAUD_DLR_HS
+,cast(null as number)       as FRAUD_DLR_V15
+
+-- tier 行的 select 加:
+,cast(null as number)       as FRAUD_DLR_HS
+,coalesce(fraud_dlr_v15, 0) as FRAUD_DLR_V15
