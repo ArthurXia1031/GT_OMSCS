@@ -16,7 +16,7 @@
      ========================================================= */
   :root{
     --bg:#f4f6f9; --panel:#ffffff; --panel-2:#eef1f5; --line:#dde3ea;
-    --ink:#151d28; --ink-dim:#4a5568; --ink-faint:#8a96a3;
+    --ink:#151d28; --ink-dim:#4a5568; --ink-faint:#6f7d8c;
     --accent:#1f6feb; --good:#1a7f37; --warn:#9a6700; --bad:#cf222e;
     --bad-soft:rgba(207,34,46,.08); --good-soft:rgba(26,127,55,.08);
     /* §02 Approved-vs-Declined split — muted, low-saturation tones (not the loud good/bad) */
@@ -35,7 +35,7 @@
   /* ---- dark mode: same variable contract, GitHub-dark-inspired palette ---- */
   html[data-theme="dark"]{
     --bg:#0d1117; --panel:#161b22; --panel-2:#1f2630; --line:#30363d;
-    --ink:#e6edf3; --ink-dim:#a5b1bf; --ink-faint:#6e7b8a;
+    --ink:#e6edf3; --ink-dim:#a5b1bf; --ink-faint:#8494a4;
     --accent:#58a6ff; --good:#3fb950; --warn:#d29922; --bad:#f85149;
     --bad-soft:rgba(248,81,73,.12); --good-soft:rgba(63,185,80,.12);
     --tf-declined:#6bb3a5; --tf-approved:#e0917f;
@@ -99,14 +99,14 @@
   .sidenav{display:none;position:fixed;left:26px;top:50%;transform:translateY(-50%);width:208px;z-index:40;
            background:transparent;max-height:calc(100vh - 160px);overflow-y:auto;
            border-left:1.5px solid var(--line);padding:6px 0}
-  .sidenav .sn-head{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--ink-faint);
+  .sidenav .sn-head{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--ink-faint);
            text-transform:uppercase;letter-spacing:0.1em;padding:0 0 12px 16px;opacity:.8}
   .sidenav a{display:flex;align-items:baseline;gap:9px;padding:7px 8px 7px 16px;margin-left:-1.5px;
            text-decoration:none;color:var(--ink-faint);font-size:12px;font-weight:600;
            line-height:1.35;border-left:1.5px solid transparent;transition:color .12s,border-color .12s}
   .sidenav a:hover{color:var(--ink)}
   .sidenav a.cur{color:var(--accent);border-left:2.5px solid var(--accent);font-weight:700;padding-left:15px}
-  .sidenav .sn-num{font-family:var(--mono);font-size:9.5px;font-weight:700;color:var(--ink-faint);flex:none;width:26px;opacity:.7}
+  .sidenav .sn-num{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--ink-faint);flex:none;width:26px;opacity:.7}
   .sidenav a.cur .sn-num{color:var(--accent);opacity:1}
   /* funnel group label: overview → diagnosis → attribution → health */
   .sidenav .sn-group{font-family:var(--mono);font-size:8.5px;font-weight:750;color:var(--ink-faint);
@@ -231,6 +231,13 @@
   /* ---- KPI module ---- */
   .scoring-note{font-family:var(--sans);font-size:11.5px;line-height:1.75;color:var(--ink-dim);background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:12px 16px;margin:0 0 18px}
   .scoring-note b{color:var(--ink);font-weight:700}
+  /* collapsed-by-default methodology notes — read once, then stay out of the daily scan path */
+  details.scoring-note{padding:0}
+  details.scoring-note summary{cursor:pointer;list-style:none;padding:10px 16px;font-weight:700;color:var(--ink);font-size:12px;user-select:none}
+  details.scoring-note summary::-webkit-details-marker{display:none}
+  details.scoring-note summary::before{content:"▸";margin-right:8px;color:var(--accent);font-size:10px}
+  details.scoring-note[open] summary::before{content:"▾"}
+  details.scoring-note .sn-body{padding:0 16px 12px}
   .kpi-legend{display:flex;gap:20px;flex-wrap:wrap;font-size:11px;font-weight:600;color:var(--ink-dim);margin:0 0 18px;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.06em}
   .kpi-legend span{display:inline-flex;align-items:center;gap:8px}
   .swatch{width:11px;height:11px;border-radius:3px;display:inline-block}
@@ -250,7 +257,7 @@
   .afpr-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink-faint);margin-top:2px}
   /* 7d mini combo (afpr line + acct bars) */
   .mini-combo{margin-top:12px;border-top:1.5px dashed var(--line);padding-top:10px}
-  .mini-combo .lbl{font-family:var(--mono);font-size:9.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.06em;display:flex;justify-content:space-between;margin-bottom:4px}
+  .mini-combo .lbl{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.06em;display:flex;justify-content:space-between;margin-bottom:4px}
   .kpi-val{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink-dim);margin-top:12px;display:flex;gap:14px;flex-wrap:wrap}
   .kpi-val b{color:var(--ink);font-weight:700}
   .tier-drawer{grid-column:1/-1;background:var(--panel-2);border:1.5px solid var(--accent);border-radius:10px;overflow:hidden;max-height:0;transition:max-height .25s ease;margin-top:-14px}
@@ -260,11 +267,11 @@
 
   table{width:100%;border-collapse:collapse;font-size:13.5px}
   th,td{text-align:right;padding:12px 16px;border-bottom:1px solid var(--line);font-family:var(--mono)}
-  th{color:var(--ink-faint);font-weight:700;font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;user-select:none}
+  th{color:var(--ink-faint);font-weight:700;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;user-select:none}
   th:first-child,td:first-child{text-align:left}
   tbody tr:hover{background:var(--panel-2)}
   td.num{color:var(--ink);font-weight:600}
-  .pill{display:inline-block;font-size:9.5px;font-weight:650;padding:2px 7px;border-radius:6px;font-family:var(--mono)}
+  .pill{display:inline-block;font-size:10px;font-weight:650;padding:2px 7px;border-radius:6px;font-family:var(--mono)}
   .pill-hpf{background:rgba(154,103,0,.12);color:var(--warn)}
   .pill-htr{background:rgba(31,111,235,.12);color:var(--accent)}
   .pill-hdf{background:rgba(207,34,46,.12);color:var(--bad)}
@@ -307,7 +314,7 @@
   .delta.down{color:var(--good)}
   svg{display:block;width:100%;overflow:visible}
   svg text{font-family:var(--mono);font-weight:550;letter-spacing:0.02em}
-  .axis-lbl{fill:var(--ink-faint);font-family:var(--mono);font-size:10px;font-weight:550}
+  .axis-lbl{fill:var(--ink-faint);font-family:var(--mono);font-size:10.5px;font-weight:550}
   .grid-line{stroke:var(--line);stroke-width:1;opacity:.55}
   .window-line{stroke:var(--warn);stroke-width:1.5;stroke-dasharray:3 3}
   .window-lbl{fill:var(--warn);font-family:var(--mono);font-size:11.5px;font-weight:600}
@@ -327,7 +334,7 @@
   .bar-val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink);text-align:right}
   /* §02.1 compact merchant table — scan-first, single color encoding ($ bar), rate as its own column */
   .dd-table{width:100%;border-collapse:collapse;font-size:12.5px}
-  .dd-table th{padding:7px 10px;border-bottom:1.5px solid var(--line);font-family:var(--mono);color:var(--ink-faint);font-weight:700;font-size:10px;letter-spacing:0.07em;text-transform:uppercase;text-align:right;user-select:none;white-space:nowrap}
+  .dd-table th{padding:7px 10px;border-bottom:1.5px solid var(--line);font-family:var(--mono);color:var(--ink-faint);font-weight:700;font-size:11px;letter-spacing:0.07em;text-transform:uppercase;text-align:right;user-select:none;white-space:nowrap}
   .dd-table th:first-child{text-align:left}
   .dd-table th[data-k]{cursor:pointer}
   .dd-table th[data-k]:hover{color:var(--ink)}
@@ -340,7 +347,7 @@
   .dd-table tbody tr:hover{background:var(--panel-2)}
   .dd-table tbody tr.sel{background:var(--panel-2);box-shadow:inset 2.5px 0 0 var(--accent)}
   .dd-mname{font-weight:700;color:var(--ink)}
-  .dd-mid{font-size:10px;color:var(--ink-faint);margin-left:6px}
+  .dd-mid{font-size:11px;color:var(--ink-faint);margin-left:6px}
   .dd-dlr{font-weight:700;color:var(--ink)}
   .dd-bar{width:92px;height:5px;background:var(--panel-2);border-radius:3px;overflow:hidden;display:inline-flex;vertical-align:middle}
   .dd-bar i{height:100%;display:block}
@@ -349,14 +356,14 @@
   .dd-grp-head{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink);margin:16px 0 4px}
   .dd-grp-head:first-child{margin-top:0}
   .dd-grp-head .ptot{margin-left:auto;color:var(--ink-dim);font-weight:600;font-size:11px}
-  .dd-more{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--accent);background:none;border:0;cursor:pointer;padding:5px 10px}
+  .dd-more{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);background:none;border:0;cursor:pointer;padding:5px 10px}
   .dd-more:hover{text-decoration:underline}
   .dd-detail h4{margin:0 0 6px;font-size:14px;font-weight:700;font-family:var(--mono);letter-spacing:-0.015em}
   .dd-detail .mname{color:var(--accent)}
   .dd-hint{color:var(--ink-faint);font-size:12px;font-family:var(--mono);padding:40px 0;text-align:center;font-weight:550}
   .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:20px 0}
   .stat{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:16px 20px}
-  .stat .l{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em}
+  .stat .l{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em}
   .stat .v{font-family:var(--mono);font-size:24px;font-weight:700;margin-top:4px;letter-spacing:-0.03em}
   .proc-group{margin-bottom:18px}
   .proc-group h5{margin:0 0 8px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px}
@@ -394,7 +401,7 @@
   .alert-title{font-size:13px;font-weight:750;margin-bottom:6px;font-family:var(--sans)}
   .alert-desc{font-size:11.5px;color:var(--ink-dim);line-height:1.55;margin-bottom:10px;font-family:var(--sans)}
   .alert-action{font-size:11.5px;color:var(--ink);margin-bottom:12px;font-family:var(--sans)}
-  .action-btn{font-family:var(--sans);font-size:10px;font-weight:700;padding:6px 14px;background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:6px;cursor:pointer;transition:all .15s ease;display:inline-block}
+  .action-btn{font-family:var(--sans);font-size:11px;font-weight:700;padding:6px 14px;background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:6px;cursor:pointer;transition:all .15s ease;display:inline-block}
   .action-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(31,111,235,.03)}
 
   .footnote{margin-top:50px;padding-top:24px;border-top:1.5px solid var(--line);font-family:var(--mono);font-size:11.5px;font-weight:550;color:var(--ink-faint);line-height:1.8}
@@ -407,12 +414,12 @@
   .heatmap-cell{border-radius:1.5px;cursor:pointer;transition:transform .1s ease, filter .1s ease;border:0.5px solid rgba(0,0,0,0.03)}
   .heatmap-cell:hover{transform:scale(1.22);z-index:10;filter:brightness(0.9);box-shadow:0 3px 8px rgba(27,31,36,0.18)!important;outline:none!important}
   
-  .health-badge{font-family:var(--sans);font-size:10px;font-weight:750;padding:2px 6px;border-radius:6px;display:inline-block}
+  .health-badge{font-family:var(--sans);font-size:10.5px;font-weight:750;padding:2px 6px;border-radius:6px;display:inline-block}
   .score-green{background:var(--good-soft);color:var(--good);border:1px solid rgba(26,127,55,0.18)}
   .score-warn{background:rgba(154,103,0,0.08);color:var(--warn);border:1px solid rgba(154,103,0,0.18)}
   .score-bad{background:var(--bad-soft);color:var(--bad);border:1px solid rgba(207,34,46,0.18)}
 
-  .demo-tag{display:inline-block;font-family:var(--sans);font-size:9.5px;font-weight:700;letter-spacing:0.08em;color:var(--warn);background:rgba(154,103,0,.1);border:1px solid rgba(154,103,0,.3);border-radius:6px;padding:2px 8px;vertical-align:middle;margin-left:8px}
+  .demo-tag{display:inline-block;font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:0.08em;color:var(--warn);background:rgba(154,103,0,.1);border:1px solid rgba(154,103,0,.3);border-radius:6px;padding:2px 8px;vertical-align:middle;margin-left:8px}
 
 
   /* sortable headers: persistent faint ⇅ affordance; the active column shows its direction */
@@ -432,7 +439,7 @@
 
   /* ---- Module 04: Volume Monitor ---- */
   .vol-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:6px}
-  .vol-table th{text-align:right;padding:10px 14px;border-bottom:1.5px solid var(--line);font-family:var(--mono);color:var(--ink-faint);font-weight:700;font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase}
+  .vol-table th{text-align:right;padding:10px 14px;border-bottom:1.5px solid var(--line);font-family:var(--mono);color:var(--ink-faint);font-weight:700;font-size:11px;letter-spacing:0.08em;text-transform:uppercase}
   .vol-table th:first-child{text-align:left}
   .vol-table td{text-align:right;padding:10px 14px;border-bottom:1px solid var(--line);font-family:var(--mono);color:var(--ink)}
   .vol-table td:first-child{text-align:left;font-weight:700}
@@ -440,7 +447,7 @@
   .vol-table tr.click{cursor:pointer;transition:background .12s}
   .vol-table tr.click:hover{background:var(--panel-2)}
   .vol-table tr.sel td{background:rgba(31,111,235,0.06);}
-  .vol-pill{display:inline-block;padding:2px 9px;border-radius:6px;font-size:10px;font-weight:700;font-family:var(--mono);letter-spacing:0.04em}
+  .vol-pill{display:inline-block;padding:2px 9px;border-radius:6px;font-size:10.5px;font-weight:700;font-family:var(--mono);letter-spacing:0.04em}
   .vol-pill.ok{background:var(--good-soft);color:var(--good)}
   .vol-pill.warn{background:rgba(154,103,0,0.12);color:var(--warn)}
   .vol-pill.bad{background:var(--bad-soft);color:var(--bad)}
@@ -450,7 +457,7 @@
   .vol-card.sel{border-color:var(--accent);border-width:1.5px;background:rgba(31,111,235,0.025)}
   .vol-card-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;font-family:var(--mono);gap:8px}
   .vol-card-name{font-size:11.5px;font-weight:750;letter-spacing:-0.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .vol-card-today{font-size:10px;font-weight:600;color:var(--ink-dim);white-space:nowrap}
+  .vol-card-today{font-size:10.5px;font-weight:600;color:var(--ink-dim);white-space:nowrap}
   .vol-card-today b{color:var(--ink);font-weight:700}
   .vol-card-chart{position:relative;cursor:zoom-in;border-radius:6px;transition:background .12s}
   .vol-card-chart:hover{background:rgba(31,111,235,0.03)}
@@ -479,13 +486,13 @@
   .cmd-chip.anomaly{background:rgba(90,102,117,.1);color:var(--ink-dim);border-color:rgba(90,102,117,.25)}
   .cmd-chip.watch{background:rgba(31,111,235,.07);color:var(--accent);border-color:rgba(31,111,235,.2)}
   /* alert column grouping */
-  .alert-group-head{font-family:var(--mono);font-size:10px;font-weight:750;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);margin:4px 0 2px;display:flex;align-items:center;gap:8px}
+  .alert-group-head{font-family:var(--mono);font-size:10.5px;font-weight:750;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);margin:4px 0 2px;display:flex;align-items:center;gap:8px}
   .alert-group-head::after{content:"";flex:1;height:1px;background:var(--line)}
   .watch-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;transition:background .12s}
   .watch-row:hover{background:var(--panel)}
   .watch-dot{width:8px;height:8px;border-radius:50%;flex:none}
   .watch-name{font-size:12px;font-weight:700;font-family:var(--sans);white-space:nowrap}
-  .watch-meta{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);margin-left:auto;white-space:nowrap}
+  .watch-meta{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-left:auto;white-space:nowrap}
 
   @media(max-width:1100px){
     .cmd-grid{grid-template-columns:1fr}
@@ -493,6 +500,21 @@
     .trend-wrap{flex-direction:column}.spark-col{width:100%}
     .dd-wrap{grid-template-columns:1fr}
     .vol-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  /* narrow phones/split-screen: stack chrome, let wide charts scroll instead of squeezing */
+  @media(max-width:700px){
+    body{padding:20px 12px 70px}
+    .masthead h1{font-size:24px}
+    .meta-row{flex-direction:column;gap:6px}
+    .summary-deck{grid-template-columns:1fr}
+    .panel{padding:18px 14px}
+    .vol-modal{padding:12px}
+    .vol-grid{grid-template-columns:1fr}
+    .trend-chart{overflow-x:auto}
+    .trend-chart svg{min-width:620px}
+    #quadrantSvg{overflow-x:auto}
+    #ddProcess{grid-template-columns:repeat(auto-fill,minmax(0,1fr))!important}
+    .dd-table td:first-child{max-width:130px}
   }
   @media print{
     body{padding:20px 30px;font-size:12px;}
@@ -575,7 +597,7 @@
 <body>
 <div id="quadrantTooltip" class="quadrant-tooltip" style="opacity:0; pointer-events:none; position:absolute; z-index:12000; background:rgba(21,29,40,0.9); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); color:#fff; border:1px solid rgba(255,255,255,0.14); border-radius:10px; padding:10px 14px; font-size:11px; box-shadow:0 8px 24px rgba(0,0,0,0.25); font-family:var(--sans); transition:opacity 0.1s ease;"></div>
 
-<div id="volModal" class="vol-modal">
+<div id="volModal" class="vol-modal" role="dialog" aria-modal="true" aria-labelledby="volModalTitle">
   <div class="vol-modal-box">
     <div class="vol-modal-head">
       <span class="vol-modal-title" id="volModalTitle"></span>
@@ -601,7 +623,7 @@
   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M6 12l6-6 6 6"/></svg>
 </button>
 
-<div class="masthead">
+<div class="masthead" role="banner">
   <h1>DFS CMPT Daily Fraud Report<span class="tag">internal</span></h1>
   <div class="meta-row">
     <span>Data as of <b id="mhAsOf">—</b></span>
@@ -614,13 +636,13 @@
 
 
 <!-- ============ PAGE 1: OVERVIEW DASHBOARD ============ -->
-<div id="page-overview" class="page active">
+<div id="page-overview" class="page active" role="main">
 <!-- ============ EXECUTIVE SUMMARY ============ -->
 <section style="margin-top:24px">
   <div class="sec-head">
     <span class="sec-num">00.1</span>
     <h2>Executive Summary — Operations Dashboard</h2>
-    <span class="sub">Key operational health indexes and fraud exposure benchmarks</span>
+    <span class="sub">Key operational health indexes and total fraud benchmarks</span>
   </div>
   <div class="summary-deck" id="summaryDeck"></div>
 </section>
@@ -633,13 +655,16 @@
     <span class="sub">AFPR Z × Total Fraud $ Z (vs 30d baseline) · click bubble to inspect source</span>
   </div>
   <div class="panel">
-    <div class="scoring-note">
-      <b>How to read</b> · Each bubble is a process, placed by two z-scores vs its own 30-day baseline —
+    <details class="scoring-note">
+      <summary>How to read</summary>
+      <div class="sn-body">
+      Each bubble is a process, placed by two z-scores vs its own 30-day baseline —
       <b>horizontal</b> = AFPR (blocking behavior), <b>vertical</b> = Total Fraud&nbsp;$. Bubble size = decline volume.
       The green <b>±2&sigma; box</b> is the stable zone; bubbles outside it are drifting. <b>Up</b> = fraud&nbsp;$ rising ·
       <b>right</b> = AFPR rising (more over-blocking) · <b>left</b> = AFPR falling (more fraud slipping through).
       Top-left = <b>Fraud Spike</b>, bottom-right = <b>Quality Bleed</b>. Click any bubble to drill into that process.
-    </div>
+      </div>
+    </details>
     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px">
       <div class="tab-strip" id="ccTabs">
         <button class="tab-btn active" data-ccfam="testing">Testing / ATM</button>
@@ -663,15 +688,18 @@
     <h2>Process Quality Cards — AFPR Control Band (±2σ) + 7d Movement</h2>
     <span class="sub">compact view · click a card to expand Tier breakdown</span>
   </div>
-  <div class="scoring-note">
-    <b>How to read.</b> The <b>Health Score (0–100)</b> starts at 100, then deducts by deviation state —
+  <details class="scoring-note">
+    <summary>How to read — Health Score methodology</summary>
+    <div class="sn-body">
+    The <b>Health Score (0–100)</b> starts at 100, then deducts by deviation state —
     Attack &minus;50 &middot; Bleed &minus;35 &middot; Anomaly &minus;25 &middot; Early&#8209;signal &minus;15 — and &minus;5 for each
     consecutive day AFPR stays &gt;1&sigma; off its 30&#8209;day mean
     (<b style="color:var(--good)">&ge;90 healthy</b> &middot; <b style="color:var(--warn)">70&ndash;89 watch</b> &middot; <b style="color:var(--bad)">&lt;70 act</b>).
     The <b>status dot</b> is <b style="color:var(--good)">green</b> when today's AFPR sits inside its 30&#8209;day &plusmn;2&sigma; control band,
     <b style="color:var(--bad)">red</b> when it breaks out (<b>beyond 2&sigma;</b> = rule&#8209;level action).
     AFPR = total accounts &divide; fraud accounts — higher means more over&#8209;blocking.
-  </div>
+    </div>
+  </details>
   <div class="panel">
     <div class="tab-strip sub pf-tabs" style="margin-bottom:16px">
       <button class="tab-btn active" data-pf="testing">Testing / ATM</button>
@@ -703,7 +731,7 @@
     <div class="trend-controls" id="afprLegend"></div>
     <div class="trend-wrap">
       <div class="trend-chart">
-        <svg id="afprSvg" viewBox="0 0 920 360" preserveAspectRatio="xMidYMid meet"></svg>
+        <svg id="afprSvg" viewBox="0 0 920 360" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Process AFPR 15-day trend chart"></svg>
         <div class="tier-legend" id="afprNote"></div>
       </div>
       <div class="spark-col" id="afprSpark"></div>
@@ -737,7 +765,7 @@
     <div class="trend-controls" id="totalFraudLegend"></div>
     <div class="trend-wrap">
       <div class="trend-chart">
-        <svg id="totalFraudSvg" viewBox="0 0 920 360" preserveAspectRatio="xMidYMid meet"></svg>
+        <svg id="totalFraudSvg" viewBox="0 0 920 360" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Total fraud daily trend chart"></svg>
       </div>
       <div class="spark-col" id="totalFraudSpark"></div>
     </div>
@@ -755,7 +783,7 @@
     <div class="trend-controls" id="trendLegend"></div>
     <div class="trend-wrap">
       <div class="trend-chart">
-        <svg id="trendSvg" viewBox="0 0 920 360" preserveAspectRatio="xMidYMid meet"></svg>
+        <svg id="trendSvg" viewBox="0 0 920 360" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Approved fraud by process and tier chart"></svg>
         <div class="tier-legend" id="tierLegend"></div>
       </div>
       <div class="spark-col" id="sparkCol"></div>
@@ -786,7 +814,7 @@
         <button data-ddv="apr" aria-pressed="false">Approved</button>
         <button data-ddv="dcl" aria-pressed="false">Declined</button>
       </div>
-      <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint)" id="ddModeHint">bar color = txn fraud rate in window</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--ink-faint)" id="ddModeHint">Rate = fraud txns ÷ all txns in window</span>
     </div>
     <div id="ddTotal">
       <div class="dd-wrap">
@@ -833,7 +861,7 @@
         <tbody id="srcPerfBody"></tbody>
       </table>
     </div>
-    <div class="rule-note">Mirrors the SAS follow-up emails (Vendor / Testing UDV / CPP Top-merchant reports): <b>Tn Aprv $</b> = approved fraud leakage attributed to tier n in the window · <b>Tn AFPR</b> = tier-level account false-positive ratio. All names and figures are randomized placeholders.</div>
+    <div class="rule-note">Mirrors the SAS follow-up emails (Vendor / Testing UDV / CPP Top-merchant reports): <b>Tn Aprv $</b> = approved fraud $ attributed to tier n in the window · <b>Tn AFPR</b> = tier-level account false-positive ratio. All names and figures are randomized placeholders.</div>
   </div>
 </section>
 
@@ -878,7 +906,7 @@
 </section>
 </div><!-- /page-overview -->
 
-<div class="footnote">
+<div class="footnote" role="contentinfo">
   <b>Self-contained report</b> · Zero external dependencies (no CDN / no fetch / no &lt;script src&gt;); sendable as a Gmail .html attachment, openable via file://.<br>
   <b>Methodology</b> · Band = 30d rolling mean ± kσ (Statistical Process Control). Beyond +3σ → over-block; beyond −3σ → check whether fraud_acct surged (rule-level decline opportunity). Values injected by automated pipeline.
 </div>
@@ -1380,6 +1408,8 @@ if (!FAMS.vendor.merchants  || !FAMS.vendor.merchants.length)  FAMS.vendor.merch
 let MERCHANTS = FAMS.testing.merchants;
 
 const $=s=>document.querySelector(s);
+// a11y: make click-driven elements keyboard-operable (Enter/Space -> click).
+function kbd(el,label){ el.tabIndex=0; el.setAttribute("role","button"); if(label) el.setAttribute("aria-label",label); el.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); el.click(); } }); }
 const fmt$=n=> n>=1e6 ? "$"+(n/1e6).toFixed(2)+"M" : n>=1e3 ? "$"+(n/1e3).toFixed(0)+"K" : "$"+Math.round(n);
 const fmtK=n=> n>=1e3 ? (n/1e3).toFixed(n>=1e4?0:1)+"k" : ""+Math.round(n);
 // Real merchants carry hct_term_owner_id as mid; synthetic ones derive a stable fake MID.
@@ -1404,7 +1434,7 @@ function miniCombo(p){
   // right-axis acct gridlines + labels (2 ticks)
   for(let g=0;g<=2;g++){ const v=bMax*g/2, yy=padT+ih-(v/bMax*ih);
     svg+=`<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W-padR}" y2="${yy.toFixed(1)}" stroke="var(--line)" stroke-width="0.6"/>`;
-    if(g>0) svg+=`<text x="${W-padR+3}" y="${(yy+3).toFixed(1)}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="8.5">${fmtK(v)}</text>`;
+    if(g>0) svg+=`<text x="${W-padR+3}" y="${(yy+3).toFixed(1)}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="9.5">${fmtK(v)}</text>`;
   }
   // account bars (total = grey, fraud = red overlay) against RIGHT axis
   p.acct7.tot.forEach((tt,i)=>{
@@ -1416,13 +1446,13 @@ function miniCombo(p){
   // AFPR line against LEFT axis
   const ax=i=>padL+gap*i+gap/2, ay=v=>padT+ih-((v-aMin)/(aMax-aMin)*ih);
   // left-axis AFPR labels (top & bottom)
-  svg+=`<text x="${padL-3}" y="${(ay(aMax*0.96)+3).toFixed(1)}" text-anchor="end" fill="${p.color}" font-family="var(--mono)" font-size="8.5">${(aMax*0.96).toFixed(0)}</text>`;
-  svg+=`<text x="${padL-3}" y="${(ay(aMin*1.05)+3).toFixed(1)}" text-anchor="end" fill="${p.color}" font-family="var(--mono)" font-size="8.5">${(aMin*1.05).toFixed(0)}</text>`;
+  svg+=`<text x="${padL-3}" y="${(ay(aMax*0.96)+3).toFixed(1)}" text-anchor="end" fill="${p.color}" font-family="var(--mono)" font-size="9.5">${(aMax*0.96).toFixed(0)}</text>`;
+  svg+=`<text x="${padL-3}" y="${(ay(aMin*1.05)+3).toFixed(1)}" text-anchor="end" fill="${p.color}" font-family="var(--mono)" font-size="9.5">${(aMin*1.05).toFixed(0)}</text>`;
   let d=p.afpr7.map((v,i)=>(i?"L":"M")+ax(i).toFixed(1)+" "+ay(v).toFixed(1)).join(" ");
   svg+=`<path d="${d}" fill="none" stroke="${p.color}" stroke-width="1.8"/>`;
   p.afpr7.forEach((v,i)=>{ svg+=`<circle cx="${ax(i).toFixed(1)}" cy="${ay(v).toFixed(1)}" r="2" fill="${p.color}"/>`; });
   // X-axis date labels: first, middle, last day of the 7d window
-  [0,3,6].forEach(i=>{ if(days[i]) svg+=`<text x="${ax(i).toFixed(1)}" y="${H-4}" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--mono)" font-size="8.5">${days[i]}</text>`; });
+  [0,3,6].forEach(i=>{ if(days[i]) svg+=`<text x="${ax(i).toFixed(1)}" y="${H-4}" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--mono)" font-size="9.5">${days[i]}</text>`; });
   // axis caps (left=AFPR, right=acct)
   svg+=`<text x="${padL-3}" y="${H-4}" text-anchor="end" fill="${p.color}" font-family="var(--mono)" font-size="7.5">AFPR</text>`;
   svg+=`<text x="${W-padR+3}" y="${H-4}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="7.5">acct</text>`;
@@ -1465,6 +1495,7 @@ function renderKPI(){
       </div>
       <div class="kpi-val"><span>TFPR <b>${p.tfpr}</b></span><span>DFPR <b>${p.dfpr.toFixed(1)}</b></span><span>2σ <b>${p.b2[0]}–${p.b2[1]}</b></span></div>`;
     card.onclick=()=>toggleTier(idx,card);
+    kbd(card, p.short + " — open tier breakdown");
     grid.appendChild(card);
   });
 }
@@ -1508,7 +1539,7 @@ function syncFilterAvailability(){
   if(!famHas("v15Avail")) excludeV15=false;
 }
 function hsMul(pid, i){ if (hsSeg === "all") return 1; const sh = (HSSHARE[pid] && HSSHARE[pid][i] != null) ? HSSHARE[pid][i] : 0.4; return hsSeg === "hs" ? sh : (1 - sh); }
-function filtBadgeHtml(withV15){ const parts=[]; if(hsSeg==="hs")parts.push("HS"); else if(hsSeg==="nonhs")parts.push("Non-HS"); if(withV15&&excludeV15)parts.push("excl v15"); return parts.length?` <span style="font-family:var(--mono);font-size:8px;font-weight:800;color:var(--warn);border:1px solid rgba(154,103,0,.35);border-radius:3px;padding:0 3px;vertical-align:middle;white-space:nowrap">${parts.join(" · ")}</span>`:""; }
+function filtBadgeHtml(withV15){ const parts=[]; if(hsSeg==="hs")parts.push("HS"); else if(hsSeg==="nonhs")parts.push("Non-HS"); if(withV15&&excludeV15)parts.push("excl v15"); return parts.length?` <span style="font-family:var(--mono);font-size:9px;font-weight:800;color:var(--warn);border:1px solid rgba(154,103,0,.35);border-radius:3px;padding:0 3px;vertical-align:middle;white-space:nowrap">${parts.join(" · ")}</span>`:""; }
 function updateFilterBadges(){ const hsTxt=hsSeg==="hs"?"HS ONLY":hsSeg==="nonhs"?"NON-HS":""; const set=(id,txt,cls)=>{ const b=document.getElementById(id); if(!b)return; if(txt){ b.className="filt-badge on "+cls; b.textContent=txt; } else { b.className="filt-badge"; b.textContent=""; } }; set("tfBadge", hsTxt, hsSeg==="nonhs"?"nonhs":"hs"); const apTxt=[hsTxt, excludeV15?"EXCL. 15-MIN VERIFIED":""].filter(Boolean).join(" · "); set("apBadge", apTxt, excludeV15?"v15":(hsSeg==="nonhs"?"nonhs":"hs")); }
 function procSum(id){ const s=Array(NDAYS).fill(0); TIERS.forEach(t=>TREND[id][t].forEach((v,i)=>s[i]+=v)); return s; }
 let chipExpanded={};
@@ -1676,7 +1707,7 @@ function drawTrend(){
     for(let i=Math.max(1,NDAYS-WIN);i<NDAYS;i++){ const d0=dSum(i-1),d1=dSum(i),a0=aSum(i-1),a1=aSum(i);
       if(d0>0 && d1>d0*1.6 && Math.abs(a1-a0)<=1){ flagged++; svg+=`<text x="${x(i).toFixed(1)}" y="${(y(d1)-6).toFixed(1)}" text-anchor="middle" font-size="11" fill="var(--warn)" style="cursor:help"><title>$ spike without account growth — likely single-account, not systemic</title>\u26a0</text>`; } }
     // secondary (fraud-account) axis ticks on the right edge, so bar heights are readable
-    [0, Math.round(maxAacct/2), Math.round(maxAacct)].forEach(av=>{ if(maxAacct<=0) return; const yy=pt+ih-(av/maxA*ih); svg+=`<text x="${(W-pr).toFixed(1)}" y="${(yy-2).toFixed(1)}" text-anchor="end" font-family="var(--mono)" font-size="8" fill="var(--ink-faint)" opacity="0.8">${av}</text>`; });
+    [0, Math.round(maxAacct/2), Math.round(maxAacct)].forEach(av=>{ if(maxAacct<=0) return; const yy=pt+ih-(av/maxA*ih); svg+=`<text x="${(W-pr).toFixed(1)}" y="${(yy-2).toFixed(1)}" text-anchor="end" font-family="var(--mono)" font-size="9" fill="var(--ink-faint)" opacity="0.8">${av}</text>`; });
     // (T1's "no 15-min verification" note lives next to the Exclude toggle in the controls row.)
     const v15note = (excludeV15 && trendTierFilter!=="T1")
       ? `<span style="margin-left:6px;color:var(--warn)">· excl. 15-min verified (rule-declinable $)</span>`
@@ -1704,7 +1735,7 @@ function renderSparks(){
   const col=$("#sparkCol"); col.innerHTML="";
   const hdr=document.createElement("div");
   hdr.className="spark-hdr";
-  hdr.style.cssText="font-family:var(--mono);font-size:9px;color:var(--ink-faint);display:grid;grid-template-columns:1fr 60px 46px 46px;gap:7px;padding:0 7px 2px;text-transform:uppercase;letter-spacing:.04em";
+  hdr.style.cssText="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);display:grid;grid-template-columns:1fr 60px 46px 46px;gap:7px;padding:0 7px 2px;text-transform:uppercase;letter-spacing:.04em";
   hdr.innerHTML="<span style='white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>Process"+filtBadgeHtml(true)+"</span><span style='text-align:center'>15d spark</span><span style='text-align:right'>DoD</span><span style='text-align:right'>Δ%</span>";
   col.appendChild(hdr);
   PROCESSES.forEach(p=>{
@@ -1724,6 +1755,7 @@ function renderSparks(){
       <span class="delta ${dod>=0?'up':'down'}" style="font-size:10.5px${lowBase?';color:var(--ink-faint);opacity:.5':''}"${lowBase?' title="small account base — % noisy"':''}>${dod>=0?'+':''}${dod.toFixed(0)}%</span>
       <span class="delta ${delta>=0?'up':'down'}"${lowBase?' style="color:var(--ink-faint);opacity:.5"':''}>${delta>=0?'+':''}${delta.toFixed(0)}%</span>`;
     row.onclick=()=>{ if(trendMode=="line"){visible.has(p.id)?visible.delete(p.id):visible.add(p.id);} else {tierFocus=p.id;} syncTrendCharts(); };
+    kbd(row, p.short);
     col.appendChild(row);
   });
 }
@@ -1837,7 +1869,7 @@ function renderDDTotal(){
       <th>Merchant</th>
       <th data-k="fdlr" class="${sortCls('fdlr')}">${dlrHead}</th>
       <th></th>
-      <th data-k="rate" class="${sortCls('rate')}">Rate</th>
+      <th data-k="rate" class="${sortCls('rate')}" title="Txn fraud rate = fraud transactions ÷ all transactions of this merchant in the window">Fraud Rate</th>
       <th data-k="frd" class="${sortCls('frd')}">Frd Accts</th>
     </tr></thead>`;
     tbl.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{
@@ -1845,6 +1877,7 @@ function renderDDTotal(){
       if(ddSort.k===k) ddSort.dir*=-1; else ddSort={k, dir:-1};
       renderDDTotal();
     });
+    tbl.querySelectorAll("th[data-k]").forEach(th=>kbd(th, "sort by " + th.textContent));
     const tb=document.createElement("tbody");
     // Real data carries 30 dedup rows — collapse to top-10 so the section stays one screen tall.
     const LIMIT=10;
@@ -1853,6 +1886,7 @@ function renderDDTotal(){
       if(i>=LIMIT && !ddListExpanded){ tr.style.display="none"; }
       tr.innerHTML=ddRowHtml(m, max);
       tr.onclick=()=>{ ddSel=m.name; renderDDTotal(); };
+      kbd(tr, m.name);
       tb.appendChild(tr);
     });
     tbl.appendChild(tb);
@@ -1891,7 +1925,7 @@ function renderDDDetail(m){
     <h4 class="mname">${m.name}</h4>
     <div style="font-family:var(--mono);font-size:10.5px;color:var(--ink-dim)">MCC ${m.mcc} · ${getMid(m)} · process: ${procLabel}</div>
     <div class="stat-grid">
-      <div class="stat"><div class="l">Fraud $${hasSplit?"":" (Leakage)"}</div><div class="v" style="color:var(--bad)">${fmt$(m.fdlr)}</div>${splitLine}</div>
+      <div class="stat"><div class="l">${hasSplit?"Total Fraud $":"Fraud $"}</div><div class="v" style="color:var(--bad)">${fmt$(m.fdlr)}</div>${splitLine}</div>
       <div class="stat"><div class="l">Txn Fraud Rate</div><div class="v" style="color:${m.rate>=10?'var(--bad)':'var(--warn)'}">${m.rate}%</div></div>
       <div class="stat"><div class="l">Accounts</div><div class="v">${m.tot.toLocaleString()}</div></div>
       <div class="stat"><div class="l">Fraud Accounts</div><div class="v">${m.frd.toLocaleString()}</div></div>
@@ -1937,6 +1971,7 @@ function renderDDProcess(){
       if(i>=5){ tr.style.display="none"; tr.dataset.extra="1"; }
       tr.innerHTML=ddRowHtml(m, globalMax);
       tr.onclick=()=>inspectMerchant(g.pid, m.name);
+      kbd(tr, m.name);
       tb.appendChild(tr);
     });
     tbl.appendChild(tb);
@@ -1959,7 +1994,7 @@ function setDDMode(mode){
   $("#ddTotal").style.display = mode=="total"?"block":"none";
   $("#ddProcess").style.display = mode=="process"?"block":"none";
   $("#ddSub").textContent = mode=="total"?"ranked by total fraud $":"grouped by source process, processes ranked by fraud $";
-  $("#ddModeHint").textContent = mode=="total"?"bar color = txn fraud rate in window":"per-process attribution — a merchant hit by several processes appears under each; $ not additive across processes";
+  $("#ddModeHint").textContent = mode=="total"?"Rate = fraud txns ÷ all txns in window":"per-process attribution — a merchant hit by several processes appears under each; $ not additive across processes";
   if(mode=="process") renderDDProcess();
 }
 
@@ -2039,7 +2074,7 @@ function drawAfpr(){
     [2, -2].forEach(zVal => {
       const yLimit = y(zVal);
       svg += `<line x1="${pl}" y1="${yLimit}" x2="${W-pr}" y2="${yLimit}" stroke="var(--warn)" stroke-width="1" stroke-dasharray="3 3" opacity="0.8"/>`;
-      svg += `<text x="${W-pr-4}" y="${yLimit - 4}" fill="var(--warn)" font-family="var(--sans)" font-size="8.5" font-weight="600" text-anchor="end">${zVal > 0 ? '+' : ''}${zVal}σ Limit</text>`;
+      svg += `<text x="${W-pr-4}" y="${yLimit - 4}" fill="var(--warn)" font-family="var(--sans)" font-size="9.5" font-weight="600" text-anchor="end">${zVal > 0 ? '+' : ''}${zVal}σ Limit</text>`;
     });
 
     const ticks = [];
@@ -2062,7 +2097,7 @@ function drawAfpr(){
     const yPlus2 = y(2);
     const yMinus2 = y(-2);
     svg += `<rect x="${pl}" y="${yPlus2.toFixed(1)}" width="${iw}" height="${(yMinus2 - yPlus2).toFixed(1)}" fill="var(--band)" opacity="0.45" rx="2"/>`;
-    svg += `<text x="${pl + 10}" y="${yPlus2 + 13}" fill="var(--accent)" font-family="var(--sans)" font-size="8.5" font-weight="700" opacity="0.65">GLOBAL STABLE BAND (±2σ)</text>`;
+    svg += `<text x="${pl + 10}" y="${yPlus2 + 13}" fill="var(--accent)" font-family="var(--sans)" font-size="9.5" font-weight="700" opacity="0.65">GLOBAL STABLE BAND (±2σ)</text>`;
   } else if (afprVisible.size === 1) {
     // Draw process-specific absolute control band if only one process is selected
     const pid = [...afprVisible][0];
@@ -2085,9 +2120,9 @@ function drawAfpr(){
       svg += `<line x1="${pl}" y1="${yMean.toFixed(1)}" x2="${W-pr}" y2="${yMean.toFixed(1)}" stroke="var(--accent)" stroke-width="0.8" stroke-dasharray="1 2" opacity="0.45"/>`;
       
       // Labels
-      svg += `<text x="${W-pr-4}" y="${yTop - 4}" fill="var(--accent)" font-family="var(--sans)" font-size="8.5" font-weight="700" text-anchor="end" opacity="0.75">${p.short} +2σ Limit (${topVal.toFixed(1)})</text>`;
-      svg += `<text x="${W-pr-4}" y="${yBot + 11}" fill="var(--accent)" font-family="var(--sans)" font-size="8.5" font-weight="700" text-anchor="end" opacity="0.75">${p.short} -2σ Limit (${botVal.toFixed(1)})</text>`;
-      svg += `<text x="${pl + 10}" y="${yMean - 4}" fill="var(--accent)" font-family="var(--sans)" font-size="8" font-weight="700" opacity="0.65">Mean (μ = ${p.mu.toFixed(1)})</text>`;
+      svg += `<text x="${W-pr-4}" y="${yTop - 4}" fill="var(--accent)" font-family="var(--sans)" font-size="9.5" font-weight="700" text-anchor="end" opacity="0.75">${p.short} +2σ Limit (${topVal.toFixed(1)})</text>`;
+      svg += `<text x="${W-pr-4}" y="${yBot + 11}" fill="var(--accent)" font-family="var(--sans)" font-size="9.5" font-weight="700" text-anchor="end" opacity="0.75">${p.short} -2σ Limit (${botVal.toFixed(1)})</text>`;
+      svg += `<text x="${pl + 10}" y="${yMean - 4}" fill="var(--accent)" font-family="var(--sans)" font-size="9" font-weight="700" opacity="0.65">Mean (μ = ${p.mu.toFixed(1)})</text>`;
     }
   }
 
@@ -2156,6 +2191,7 @@ function renderAfprSpark(){
       <span style="text-align:right;color:${out?'var(--bad)':'var(--ink)'};font-weight:600">${valText}</span>
       <span class="delta ${dev>=0?'up':'down'}">${devText}</span>`;
     row.onclick=()=>{ afprVisible.has(p.id)?afprVisible.delete(p.id):afprVisible.add(p.id); syncTrendCharts(); };
+    kbd(row, p.short);
     col.appendChild(row);
   });
 }
@@ -2323,14 +2359,14 @@ function drawCommandCenter() {
   svg += `<rect x="${xLeft.toFixed(1)}" y="${yTop.toFixed(1)}" width="${boxW.toFixed(1)}" height="${boxH.toFixed(1)}" fill="rgba(26,127,55,0.04)" stroke="var(--good)" stroke-width="1.3" stroke-dasharray="3 3" opacity="0.8" rx="4"/>`;
   
   // Clean "STABLE ZONE (±2σ)" label in the upper corner of the stable box
-  svg += `<text x="${(xLeft + 8).toFixed(1)}" y="${(yTop + 14).toFixed(1)}" fill="var(--good)" font-family="var(--sans)" font-size="8.5" font-weight="750" opacity="0.85">STABLE ZONE (±2σ)</text>`;
+  svg += `<text x="${(xLeft + 8).toFixed(1)}" y="${(yTop + 14).toFixed(1)}" fill="var(--good)" font-family="var(--sans)" font-size="9.5" font-weight="750" opacity="0.85">STABLE ZONE (±2σ)</text>`;
 
   // Quadrant labels — single line each (sublines removed to cut clutter; axis titles carry the
   // directional meaning). The two actionable quadrants are bold; the other two are faint.
   svg += `<text x="${pl+12}" y="${pt+18}" fill="var(--bad)" font-family="var(--sans)" font-size="10" font-weight="750" opacity="0.9">FRAUD SPIKE</text>`;
   svg += `<text x="${W-pr-12}" y="${H-pb-10}" fill="var(--warn)" font-family="var(--sans)" font-size="10" font-weight="750" text-anchor="end" opacity="0.9">QUALITY BLEED</text>`;
-  svg += `<text x="${pl+12}" y="${H-pb-10}" fill="var(--ink-faint)" font-family="var(--sans)" font-size="8.5" font-weight="600" opacity="0.55">early-spike watch</text>`;
-  svg += `<text x="${W-pr-12}" y="${pt+18}" fill="var(--ink-faint)" font-family="var(--sans)" font-size="8.5" font-weight="600" text-anchor="end" opacity="0.55">anomaly · check data</text>`;
+  svg += `<text x="${pl+12}" y="${H-pb-10}" fill="var(--ink-faint)" font-family="var(--sans)" font-size="9.5" font-weight="600" opacity="0.55">early-spike watch</text>`;
+  svg += `<text x="${W-pr-12}" y="${pt+18}" fill="var(--ink-faint)" font-family="var(--sans)" font-size="9.5" font-weight="600" text-anchor="end" opacity="0.55">anomaly · check data</text>`;
 
   // Axis titles
   svg += `<text x="${pl+iw/2}" y="${H-12}" fill="var(--ink-dim)" font-family="var(--sans)" font-size="10.5" font-weight="700" text-anchor="middle">AFPR Z-Score (vs 30d) — fraud-share signal</text>`;
@@ -2338,8 +2374,8 @@ function drawCommandCenter() {
 
   // tick labels
   [-2, -1, 1, 2].forEach(t => {
-    svg += `<text x="${getX(t)}" y="${pt+ih+15}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="8.5" text-anchor="middle">${t>0?'+':''}${t}σ</text>`;
-    svg += `<text x="${pl-6}" y="${getY(t)+3}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="8.5" text-anchor="end">${t>0?'+':''}${t}σ</text>`;
+    svg += `<text x="${getX(t)}" y="${pt+ih+15}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="9.5" text-anchor="middle">${t>0?'+':''}${t}σ</text>`;
+    svg += `<text x="${pl-6}" y="${getY(t)+3}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="9.5" text-anchor="end">${t>0?'+':''}${t}σ</text>`;
   });
 
   // Bubble size encodes business volume (process total decline acct)
@@ -2362,7 +2398,9 @@ function drawCommandCenter() {
     else if (p.kind === "early-bleed")  { fill = "var(--early-bleed)";       op = 0.65; }
 
     svg += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="${fill}" opacity="${op}"${sw?` stroke="${stroke}" stroke-width="${sw}"`:""}
-      style="cursor:pointer;"
+      style="cursor:pointer;" tabindex="0" role="button"
+      aria-label="${p.short}: ${p.kind}, AFPR z ${p.zA.toFixed(1)} sigma, fraud dollar z ${p.zD.toFixed(1)} sigma"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();ccBubbleClick('${p.id}')}"
       onmouseover="showTooltip(event, '${p.id}')"
       onmousemove="moveTooltip(event)"
       onmouseout="hideTooltip()"
@@ -2382,7 +2420,7 @@ function drawCommandCenter() {
   });
 
   // legend strip
-  svg += `<text x="${W-pr-12}" y="${H-pb+26}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="8.5" text-anchor="end" opacity="0.75">bubble area ∝ total decline accts</text>`;
+  svg += `<text x="${W-pr-12}" y="${H-pb+26}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="9.5" text-anchor="end" opacity="0.75">bubble area ∝ total decline accts</text>`;
 
   svg += `</svg>`;
   $("#quadrantSvg").innerHTML = svg;
@@ -2542,6 +2580,7 @@ function renderAlerts() {
         <span class="watch-name">${p.short}</span>
         <span class="watch-meta">${label} <b style="color:${dotColor}">${zAStr}σ</b> · $ flat</span>`;
       row.onclick = () => ccBubbleClick(p.id);
+      kbd(row, p.short + " — inspect process");
       container.appendChild(row);
     });
   }
@@ -2747,7 +2786,7 @@ function drawTotalFraud(){
 function renderTotalFraudSparks(){
   const col=$("#totalFraudSpark"); if(!col) return; col.innerHTML="";
   const hdr=document.createElement("div"); hdr.className="spark-hdr";
-  hdr.style.cssText="font-family:var(--mono);font-size:9px;color:var(--ink-faint);display:grid;grid-template-columns:1fr 60px 46px 46px;gap:7px;padding:0 7px 2px;text-transform:uppercase;letter-spacing:.04em";
+  hdr.style.cssText="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);display:grid;grid-template-columns:1fr 60px 46px 46px;gap:7px;padding:0 7px 2px;text-transform:uppercase;letter-spacing:.04em";
   hdr.innerHTML="<span style='white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>Process"+filtBadgeHtml(false)+"</span><span style='text-align:center'>15d spark</span><span style='text-align:right'>DoD</span><span style='text-align:right'>\u0394%</span>";
   col.appendChild(hdr);
   PROCESSES.forEach(p=>{
@@ -2766,6 +2805,7 @@ function renderTotalFraudSparks(){
       <span class="delta ${dod>=0?'up':'down'}" style="font-size:10.5px${lowBase?';color:var(--ink-faint);opacity:.5':''}"${lowBase?' title="small account base — % noisy"':''}>${dod>=0?'+':''}${dod.toFixed(0)}%</span>
       <span class="delta ${delta>=0?'up':'down'}"${lowBase?' style="color:var(--ink-faint);opacity:.5"':''}>${delta>=0?'+':''}${delta.toFixed(0)}%</span>`;
     row.onclick=()=>{ tfVisible.has(p.id)?tfVisible.delete(p.id):tfVisible.add(p.id); syncTrendCharts(); };
+    kbd(row, p.short);
     col.appendChild(row);
   });
 }
@@ -2930,12 +2970,12 @@ function volChart(pid) {
   [minV, (minV + maxV) / 2, maxV].forEach(v => {
     const yy = y(v);
     svg += `<line x1="${pl}" y1="${yy.toFixed(1)}" x2="${W - pr}" y2="${yy.toFixed(1)}" stroke="var(--line)" stroke-width="0.6" opacity="0.55"/>`;
-    svg += `<text x="${pl - 4}" y="${(yy + 3).toFixed(1)}" text-anchor="end" font-family="var(--mono)" font-size="8" fill="var(--ink-faint)">${fmtK(v)}</text>`;
+    svg += `<text x="${pl - 4}" y="${(yy + 3).toFixed(1)}" text-anchor="end" font-family="var(--mono)" font-size="9" fill="var(--ink-faint)">${fmtK(v)}</text>`;
   });
   // x date ticks (3)
   const _vd = volDates();
   [0, Math.floor((NDAYS - 1) / 2), NDAYS - 1].forEach(i => {
-    svg += `<text x="${x(i).toFixed(1)}" y="${H - 5}" text-anchor="middle" font-family="var(--mono)" font-size="8" fill="var(--ink-faint)">${_vd[i]}</text>`;
+    svg += `<text x="${x(i).toFixed(1)}" y="${H - 5}" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--ink-faint)">${_vd[i]}</text>`;
   });
   // OLS trend line (red dashed)
   svg += `<line x1="${x(0).toFixed(1)}" y1="${y(reg.y0).toFixed(1)}" x2="${x(NDAYS - 1).toFixed(1)}" y2="${y(reg.yN).toFixed(1)}" stroke="var(--bad)" stroke-width="1.3" stroke-dasharray="4 3" opacity="0.78"/>`;
@@ -3008,6 +3048,7 @@ function renderVolumeTable() {
       <td><span class="vol-pill ${status}">${statusLabel}</span></td>
     `;
     row.onclick = () => selectVolume(p.id, "row");
+    kbd(row, p.short + " — volume detail");
     body.appendChild(row);
   });
 }
@@ -3034,6 +3075,7 @@ function renderVolumeCharts() {
     `;
     // Card head click selects (syncs with table); chart click opens the enlarged modal.
     card.onclick = () => selectVolume(p.id, "card");
+    kbd(card, p.short + " — volume detail");
     card.querySelector(".vol-card-chart").onclick = (e) => { e.stopPropagation(); openVolModal(p.id); };
     grid.appendChild(card);
   });
@@ -3116,9 +3158,14 @@ window.openVolModal = function(pid) {
   setupSvgHover("volModalSvg", { W: c.W, pl: c.pl, iw: c.iw, pt: c.pt, ih: c.ih, n: NDAYS,
     dateAt: i => volDates()[i],
     rowsAt: i => [{ label: c.p.short, color: c.color, value: c.s[i].toLocaleString() + " " + VOL_GROUP_META[volGroup].unit, y: c.y(c.s[i]) }] });
+  window._volModalOpener = document.activeElement;   // restore focus here on close (a11y)
   $("#volModal").classList.add("open");
+  const _cb = document.querySelector(".vol-modal-close"); if (_cb) _cb.focus();
 };
-window.closeVolModal = function() { $("#volModal").classList.remove("open"); };
+window.closeVolModal = function() {
+  $("#volModal").classList.remove("open");
+  if (window._volModalOpener && window._volModalOpener.focus) { window._volModalOpener.focus(); window._volModalOpener = null; }
+};
 
 // Switch the active volume group (Testing / CPP / Vendor / Merchant-List) and re-render.
 function setVolGroup(g) {
@@ -3269,7 +3316,7 @@ function renderExecutiveSummary() {
     
     <div class="summary-card">
       <div class="summary-card-text">
-        <div class="label">Total Fraud Exposure</div>
+        <div class="label">Total Fraud $</div>
         <div class="value">$${totalFraudToday.toLocaleString(undefined, {maximumFractionDigits:0})}</div>
         <div class="subtext"><span style="color:${fraudColorClass};font-weight:700">${fraudDiffStr}</span> vs. mean ($${totalFraudMean.toLocaleString(undefined, {maximumFractionDigits:0})})</div>
       </div>
@@ -3396,6 +3443,7 @@ function initSrcPerf() {
     document.querySelectorAll("#srcPerfTabs .tab-btn").forEach(x => x.classList.toggle("active", x === b));
     renderSrcPerf();
   });
+  document.querySelectorAll("#srcPerfTable th").forEach(th => kbd(th, "sort by " + th.textContent.trim()));
   document.querySelectorAll("#srcPerfTable th").forEach(th => th.onclick = () => {
     const k = th.dataset.k;
     if (srcSort.k === k) srcSort.dir *= -1;
