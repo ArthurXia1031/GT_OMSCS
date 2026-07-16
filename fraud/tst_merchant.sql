@@ -8,7 +8,18 @@ with base as (
         a.hct_mer_mcc         as mcc,
         -- Testing 归因:交易行自带各测试的事件日期列;auth 落在 [事件日, 事件日+10] 即命中该 source。
         -- ⚠ 名字必须和 Q2 过程 SQL 的 UDVsrce 字符串一字不差,§02.1 By-Process 才能和 process 对上。
-        
+        array_construct_compact(
+            case when cast(a.auth_dt as date) between cast(a.v_a_test_big_merch_dt as date)        and cast(a.v_a_test_big_merch_dt as date)+10        then 'v_a_test_big_merch_dt' end,
+            case when cast(a.auth_dt as date) between cast(a.v_d_low_dlr_frd_merch_dt as date)     and cast(a.v_d_low_dlr_frd_merch_dt as date)+10     then 'v_d_low_dlr_frd_merch_dt' end,
+            case when cast(a.auth_dt as date) between cast(a.v_a_high_prefrd_merch_test_dt as date) and cast(a.v_a_high_prefrd_merch_test_dt as date)+10 then 'v_a_high_prefrd_merch_test_dt' end,
+            case when cast(a.auth_dt as date) between cast(a.v_a_no_hist_email_test_dt as date)    and cast(a.v_a_no_hist_email_test_dt as date)+10    then 'v_a_no_hist_email_test_dt' end,
+            case when cast(a.auth_dt as date) between cast(a.v_d_0dlr_highscr_tran_dt as date)     and cast(a.v_d_0dlr_highscr_tran_dt as date)+10     then 'v_d_0dlr_highscr_tran_dt' end,
+            case when cast(a.auth_dt as date) between cast(a.v_a_testing_u_mrch_risky_dt as date)  and cast(a.v_a_testing_u_mrch_risky_dt as date)+10  then 'v_a_testing_u_mrch_risky_dt' end,
+            case when cast(a.auth_dt as date) between cast(a.v_a_testing_0_cnp_risky_dt as date)   and cast(a.v_a_testing_0_cnp_risky_dt as date)+10   then 'v_a_testing_0_cnp_risky_dt' end,
+            case when cast(a.auth_dt as date) between cast(a.v_a_1dlr_highscr_exp_date as date)    and cast(a.v_a_1dlr_highscr_exp_date as date)+10    then 'v_a_1dlr_highscr_exp_date' end
+            /* ↑ 这 8 个是我从你截图里读到的;你的 Q2 有 15 个 testing source —
+               照 mliu_udvlvl_flwup_acct 的 branch 清单 1:1 补齐剩下的,一 branch 一行 case */
+        ) as srcs
     from  a
     where a.tran_amt > 20
       and a.auth_dt between current_date()-10 and current_date()-1     -- Testing 快照窗 = 10d(与 Q2 一致)
