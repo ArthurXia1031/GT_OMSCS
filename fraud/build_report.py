@@ -12,7 +12,7 @@ The HTML template (cmpt_report_pro.html) already contains the hook:
     const INJECTED_DATA = null;
 
 This script replaces `const INJECTED_DATA = null;` with the real object. If the template
-is left untouched (INJECTED_DATA === null), the report falls back to its synthetic demo data.
+is left untouched (INJECTED_DATA === null), the report falls back to its synthetic demo53/ data.
 
 IMPORTANT: the script keys off COLUMN HEADERS and SHEET NAMES, not the actual values, and
 matches them tolerantly (case-insensitive, punctuation-insensitive, contains-fallback).
@@ -546,7 +546,7 @@ def build_merchant_payload(rows, family):
         frd_tran = coerce_num(_pick(rl, "FRAUD_TRAN", "FRD_TRAN"))
         mid = _pick(rl, "MID", "TERM_OWNER_ID")
         mcc = _pick(rl, "MCC", "MCC_CDE")
-        out.append({
+        rec = {
             "name": name,
             "mid": (str(mid).strip() if mid not in (None, "") else None),
             "mcc": (str(mcc).strip() if mcc not in (None, "") else None),
@@ -556,7 +556,15 @@ def build_merchant_payload(rows, family):
             "frd": int(coerce_num(_pick(rl, "FRAUD_ACCT", "FRD_ACCT"))),
             "fdlr": int(coerce_num(_pick(rl, "FRAUD_DLR", "FRAUD_DLR_LEAK", "APRV_FRAUD_DLR"))),
             "rate": (round(frd_tran / tot_tran * 100, 1) if tot_tran else 0),
-        })
+        }
+        # Optional approve/decline splits (FRAUD_DLR = FRAUD_DLR_APR + FRAUD_DLR_DCL when present).
+        # Emitted only when the SQL supplies the column — the dashboard shows totals-only otherwise.
+        for key, cols in (("fdlrApr", ("FRAUD_DLR_APR",)), ("fdlrDcl", ("FRAUD_DLR_DCL",)),
+                          ("frdApr", ("FRAUD_ACCT_APR",)), ("frdDcl", ("FRAUD_ACCT_DCL",))):
+            v = _pick(rl, *cols)
+            if v is not None:
+                rec[key] = int(coerce_num(v))
+        out.append(rec)
     out.sort(key=lambda m: m["fdlr"], reverse=True)
     return out or None
 
@@ -624,7 +632,11 @@ def inject(template_path, payload, out_path):
     vol = payload.get("volume", {})
     vol_desc = ", ".join("%s:%d" % (g, len(v.get("procs", []))) for g, v in vol.items()) or "—"
     fams = payload.get("families", {})
-    fam_desc = ", ".join("%s:%d" % (f, len(v.get("procs", []))) for f, v in fams.items()) or "—"
+    # per family: <procs>p + <merchant rows>m — so a build with/without Q3 merchants is visible at a glance
+    fam_desc = ", ".join(
+        "%s:%dp%s" % (f, len(v.get("procs", [])),
+                      ("+%dm" % len(v["merchants"])) if v.get("merchants") else "")
+        for f, v in fams.items()) or "—"
     print(f"OK  wrote {out_path}  ({kb:.0f} KB)  — rule views {n_views}, sheets {n_sheets}, volume[{vol_desc}], families[{fam_desc}]")
 
 
@@ -681,7 +693,9 @@ def main():
                 # (distinct accts deduped + summed $), so Python only aligns — no second window.
                 fp = build_family_payload(fetch_cpp_volume(conn, sql, label="%s process SQL" % fam), fam, roll=1)
                 if fp:
-                    payload.setdefault("families", {}).update(fp)
+                    # merge INTO the family slot (never replace it) — so keys attached by other
+                    # loops (e.g. Q3 merchants) survive regardless of loop order.
+                    payload.setdefault("families", {}).setdefault(fam, {}).update(fp[fam])
                     print("  fetched %s process metrics: %d sources x %d days" % (fam, len(fp[fam]["procs"]), len(fp[fam]["dates"])))
                 else:
                     print("  WARNING: %s process-metrics query returned no rows" % fam)
