@@ -1732,6 +1732,7 @@ function renderSparks(){
 let ddMode="total", ddSel=null;
 let ddSort={k:"fdlr",dir:-1};   // §02.1 table sort: fdlr | rate | frd
 let ddDlrView="all";            // §02.1 $ view: "all" (total) | "apr" (approved) | "dcl" (declined)
+let ddListExpanded=false;       // §02.1 By-Total$ table: collapsed = top-10 rows (real data has 30+)
 const rateColor=r=> r>=10?"var(--bad)": r>=5?"var(--warn)":"var(--accent)";
 const rateCls=r=> r>=10?"hi": r>=5?"md":"lo";
 // View-aware accessors: ranking, bars and group totals all follow the selected $ view.
@@ -1782,7 +1783,7 @@ function renderDDTotal(){
     allBtn.style.fontWeight = "700";
   }
   allBtn.textContent = "All Processes";
-  allBtn.onclick = () => { ddProcessFilter = "all"; renderDDTotal(); };
+  allBtn.onclick = () => { ddProcessFilter = "all"; ddListExpanded = false; renderDDTotal(); };
   filterWrap.appendChild(allBtn);
   
   PROCESSES.forEach(p => {
@@ -1794,7 +1795,7 @@ function renderDDTotal(){
       b.style.fontWeight = "700";
     }
     b.innerHTML = `<i class="swatch" style="background:${p.color}"></i>${p.short}`;
-    b.onclick = () => { ddProcessFilter = p.id; renderDDTotal(); };
+    b.onclick = () => { ddProcessFilter = p.id; ddListExpanded = false; renderDDTotal(); };
     filterWrap.appendChild(b);
   });
   wrap.appendChild(filterWrap);
@@ -1845,14 +1846,23 @@ function renderDDTotal(){
       renderDDTotal();
     });
     const tb=document.createElement("tbody");
-    list.forEach(m=>{
+    // Real data carries 30 dedup rows — collapse to top-10 so the section stays one screen tall.
+    const LIMIT=10;
+    list.forEach((m,i)=>{
       const tr=document.createElement("tr"); if(ddSel===m.name) tr.className="sel";
+      if(i>=LIMIT && !ddListExpanded){ tr.style.display="none"; }
       tr.innerHTML=ddRowHtml(m, max);
       tr.onclick=()=>{ ddSel=m.name; renderDDTotal(); };
       tb.appendChild(tr);
     });
     tbl.appendChild(tb);
     wrap.appendChild(tbl);
+    if(list.length>LIMIT){
+      const more=document.createElement("button"); more.className="dd-more";
+      more.textContent=ddListExpanded ? "show less" : `+${list.length-LIMIT} more merchants`;
+      more.onclick=()=>{ ddListExpanded=!ddListExpanded; renderDDTotal(); };
+      wrap.appendChild(more);
+    }
     renderDDDetail(list.find(m => m.name === ddSel));
   }
 }
@@ -2260,7 +2270,7 @@ function setProcFam(f, anchorEl) {
   // reset per-section view state to sensible defaults for the new family
   visible.clear();     PROCESSES.slice().sort((a, b) => b.fdlr - a.fdlr).slice(0, 3).forEach(p => visible.add(p.id));
   // afprVisible === tfVisible === visible (§01.2 AFPR + §01.3 Fraud $ share one selection) — reset above covers all three.
-  tierFocus = null; trendTierFilter = "all"; ddSel = null; ddProcessFilter = "all"; ddDlrView = "all";
+  tierFocus = null; trendTierFilter = "all"; ddSel = null; ddProcessFilter = "all"; ddDlrView = "all"; ddListExpanded = false;
   if (openDrawer) { openDrawer.remove(); openDrawer = null; }
   document.querySelectorAll(".pf-tabs .tab-btn").forEach(b => b.classList.toggle("active", b.dataset.pf === f));
   // keep §00.1 Command Center on the same family (all four sections now share one family state)
