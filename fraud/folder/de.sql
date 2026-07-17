@@ -1,0 +1,5 @@
+QUALIFY LEAST(
+    ROW_NUMBER() OVER (PARTITION BY srce ORDER BY fraud_dlr     DESC),
+    ROW_NUMBER() OVER (PARTITION BY srce ORDER BY fraud_dlr_apr DESC),
+    ROW_NUMBER() OVER (PARTITION BY srce ORDER BY fraud_dlr_dcl DESC)
+) <= 10
