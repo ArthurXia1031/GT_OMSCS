@@ -81,6 +81,29 @@
   .theme-toggle .moon-icon{right:7px;color:var(--ink-faint);opacity:.45}
   html[data-theme="dark"] .theme-toggle .sun-icon{color:var(--ink-faint);opacity:.45}
   html[data-theme="dark"] .theme-toggle .moon-icon{color:#9ecbff;opacity:1}
+  .fam-nav{display:flex;align-items:center;gap:9px;margin-left:22px}
+  .fam-label{font-family:var(--mono);font-size:10px;font-weight:750;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.09em;cursor:help}
+  /* Marks a module that does NOT follow the topnav category selector. */
+  .scope-tag{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+        color:var(--ink-faint);border:1px solid var(--line);border-radius:4px;padding:1px 5px;white-space:nowrap}
+  .sec-head .scope-tag{margin-left:2px}
+  .fam-nav .tab-strip{padding:3px}
+  .fam-nav .tab-btn{font-size:11.5px;padding:5px 13px}
+  /* Methodology reads like documentation: sticky left contents, one module at a time on the right */
+  .method-wrap{display:grid;grid-template-columns:230px 1fr;gap:28px;align-items:start}
+  .method-toc{position:sticky;top:74px;display:flex;flex-direction:column;gap:1px;border-left:1.5px solid var(--line)}
+  .method-toc button{text-align:left;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink-faint);
+        background:none;border:0;border-left:2.5px solid transparent;margin-left:-1.5px;padding:7px 10px;cursor:pointer;
+        display:flex;gap:9px;line-height:1.35;transition:color .12s,border-color .12s}
+  .method-toc button:hover{color:var(--ink)}
+  .method-toc button.cur{color:var(--accent);border-left-color:var(--accent);font-weight:750}
+  .method-toc .mnum{font-family:var(--mono);font-size:10px;font-weight:700;opacity:.7;flex:none;width:26px}
+  @media(max-width:900px){
+    .method-wrap{grid-template-columns:1fr}
+    .method-toc{position:static;flex-direction:row;flex-wrap:wrap;border-left:0;gap:6px}
+    .method-toc button{border:1px solid var(--line);border-radius:16px;padding:5px 12px;margin-left:0}
+    .method-toc button.cur{border-color:var(--accent)}
+  }
   .page{display:none}
   .page.active{display:block}
 
@@ -131,6 +154,7 @@
     margin: 20px 0 32px;
   }
   .summary-card {
+    position: relative;
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 14px;
@@ -176,6 +200,8 @@
     font-weight: 550;
     line-height: 1.4;
   }
+  .summary-card .go{position:absolute;right:13px;bottom:9px;font-size:15px;line-height:1;color:var(--ink-faint);opacity:.4;transition:opacity .15s,transform .15s,color .15s}
+  .summary-card:hover .go{opacity:1;transform:translateX(2px);color:var(--accent)}
   .micro-spark {
     width: 80px;
     height: 30px;
@@ -245,24 +271,36 @@
   .kpi-card{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:22px 24px;cursor:pointer;transition:border-color .15s,transform .1s,box-shadow .15s}
   .kpi-card:hover{border-color:var(--ink-faint);transform:translateY(-2px);box-shadow:0 4px 12px rgba(27,31,36,.06)}
   .kpi-card.open{border-color:var(--accent);border-width:1.5px;}
-  .kpi-card.alert{border-left:3px solid var(--bad);background:var(--bad-soft)}
+  /* one border colour per status — red is reserved for ACTION·SPIKE only */
+  .kpi-card.k-attack{border-left:3px solid var(--bad);background:var(--bad-soft)}
+  .kpi-card.k-bleed{border-left:3px solid var(--warn);background:rgba(154,103,0,.05)}
+  .kpi-card.k-check{border-left:3px solid var(--ink-dim);background:rgba(90,102,117,.04)}
+  .kpi-card.k-watch{border-left:3px solid var(--accent);background:rgba(31,111,235,.03)}
   .kpi-name{font-family:var(--mono);font-size:14px;color:var(--ink);font-weight:700;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;letter-spacing:-0.015em}
   .status-dot{width:9px;height:9px;border-radius:50%}
   /* SPC band track */
+  /* One track = one KPI: axis + mu +-2s band + today's marker. Used by BOTH rows (AFPR and
+     Fraud $) so the two read as the same instrument and can be compared at a glance. */
   .afpr-track{position:relative;height:28px;margin:4px 0 2px}
   .afpr-axis{position:absolute;left:0;right:0;top:13px;height:1.5px;background:var(--line)}
   .afpr-band2{position:absolute;top:6px;height:16px;background:var(--band);border-left:1.5px dashed rgba(31,111,235,.5);border-right:1.5px dashed rgba(31,111,235,.5)}
   .afpr-center{position:absolute;top:4px;height:20px;width:1px;background:var(--ink-faint);opacity:.6}
   .afpr-mark{position:absolute;top:4px;width:3.5px;height:20px;border-radius:2.5px;transform:translateX(-50%)}
   .afpr-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink-faint);margin-top:2px}
+  .afpr-track.t2{margin-top:9px}
+  .afpr-track.t2::before{content:"";position:absolute;left:0;right:0;top:-7px;border-top:1px dashed var(--line);opacity:.7}
+  /* today sits outside the drawn range: pin the marker to the edge and flag it */
+  .afpr-mark.clip{width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;top:9px;border-radius:0}
   /* 7d mini combo (afpr line + acct bars) */
   .mini-combo{margin-top:12px;border-top:1.5px dashed var(--line);padding-top:10px}
   .mini-combo .lbl{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.06em;display:flex;justify-content:space-between;margin-bottom:4px}
   .kpi-val{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink-dim);margin-top:12px;display:flex;gap:14px;flex-wrap:wrap}
   .kpi-val b{color:var(--ink);font-weight:700}
   .tier-drawer{grid-column:1/-1;background:var(--panel-2);border:1.5px solid var(--accent);border-radius:10px;overflow:hidden;max-height:0;transition:max-height .25s ease;margin-top:-14px}
-  .tier-drawer.open{max-height:280px;margin-top:0}
+  .tier-drawer.open{max-height:400px;margin-top:0}
   .tier-inner{padding:18px 20px}
+  .drawer-grid{display:grid;grid-template-columns:minmax(270px,1fr) 2.05fr;gap:26px;align-items:start}
+  @media(max-width:900px){ .drawer-grid{grid-template-columns:1fr} .tier-drawer.open{max-height:640px} }
   .tier-inner h4{margin:0 0 12px;font-size:13px;font-weight:700;font-family:var(--mono);color:var(--accent);letter-spacing:-0.015em}
 
   table{width:100%;border-collapse:collapse;font-size:13.5px}
@@ -414,10 +452,19 @@
   .heatmap-cell{border-radius:1.5px;cursor:pointer;transition:transform .1s ease, filter .1s ease;border:0.5px solid rgba(0,0,0,0.03)}
   .heatmap-cell:hover{transform:scale(1.22);z-index:10;filter:brightness(0.9);box-shadow:0 3px 8px rgba(27,31,36,0.18)!important;outline:none!important}
   
-  .health-badge{font-family:var(--sans);font-size:10.5px;font-weight:750;padding:2px 6px;border-radius:6px;display:inline-block}
-  .score-green{background:var(--good-soft);color:var(--good);border:1px solid rgba(26,127,55,0.18)}
-  .score-warn{background:rgba(154,103,0,0.08);color:var(--warn);border:1px solid rgba(154,103,0,0.18)}
-  .score-bad{background:var(--bad-soft);color:var(--bad);border:1px solid rgba(207,34,46,0.18)}
+  /* 01.1 — explicit status + decision grid + context badges (the 0–100 health score is retired:
+     it re-encoded 00.2's classification through uncalibrated deductions and faked precision) */
+  .kpi-status{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.05em;white-space:nowrap}
+  .kpi-badges{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
+  .kbadge{font-family:var(--mono);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:6px;letter-spacing:.04em}
+  .kbadge.b-persist{background:rgba(130,80,223,.10);color:var(--pc-purple);border:1px solid rgba(130,80,223,.30)}
+  .kbadge.b-scale{background:var(--panel-2);color:var(--ink-dim);border:1px solid var(--line);font-weight:750}
+  .kbadge.b-dim{background:var(--panel);color:var(--ink-faint);border:1px solid var(--line)}
+  .kpi-decision{display:grid;grid-template-columns:auto auto;justify-content:space-between;gap:3px 18px;margin-top:10px;border-top:1.5px dashed var(--line);padding-top:9px;font-family:var(--mono);font-size:11px}
+  .kpi-decision span{color:var(--ink-faint)}
+  .kpi-decision b{text-align:right;color:var(--ink);font-weight:700}
+  .kpi-card .expand-hint{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);opacity:.55;margin-top:7px;text-align:right}
+  .kpi-card:hover .expand-hint{opacity:1;color:var(--accent)}
 
   .demo-tag{display:inline-block;font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:0.08em;color:var(--warn);background:rgba(154,103,0,.1);border:1px solid rgba(154,103,0,.3);border-radius:6px;padding:2px 8px;vertical-align:middle;margin-left:8px}
 
@@ -515,12 +562,18 @@
     #quadrantSvg{overflow-x:auto}
     #ddProcess{grid-template-columns:repeat(auto-fill,minmax(0,1fr))!important}
     .dd-table td:first-child{max-width:130px}
+    /* stop the section number / long title / uppercase subtitle from squeezing each other */
+    .sec-head{flex-wrap:wrap;gap:6px 12px}
+    .sec-head .sub{flex-basis:100%;margin-left:0;padding-left:40px;text-align:left}
   }
   @media print{
     body{padding:20px 30px;font-size:12px;}
     .action-btn,.seg-toggle,.leg-btn,.dd-mode,.topnav,.sidenav,.back-to-top{display:none!important}
     body{padding-left:30px!important}
-    .page{display:block!important}
+    /* WYSIWYG: print the page on screen. Forcing every .page visible printed Methodology
+       onto the end of every Dashboard print job. */
+    .page{display:none!important}
+    .page.active{display:block!important}
     .panel{box-shadow:none;break-inside:avoid}
     section{page-break-inside:avoid}
     .cmd-grid{grid-template-columns:1fr}
@@ -570,9 +623,6 @@
   /* score badges: keep the base soft-tint pills (tinted bg + colored text) — solid gradient
      pills shouted louder than the data. Loud color stays reserved for true alerts. */
 
-  /* alert status dot pulse */
-  .kpi-card.alert .status-dot{ animation:v7Pulse 1.9s ease-in-out infinite; }
-  @keyframes v7Pulse{ 0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--bad) 60%, transparent);} 70%{box-shadow:0 0 0 7px transparent;} 100%{box-shadow:0 0 0 0 transparent;} }
 
   /* button micro-interactions */
   .leg-btn,.action-btn{ transition:transform .15s var(--v7-ease), box-shadow .15s, border-color .15s, color .15s, background .15s; }
@@ -595,6 +645,7 @@
 </style>
 </head>
 <body>
+<div id="lineTooltip" style="opacity:0; pointer-events:none; position:absolute; z-index:12001; background:var(--panel); color:var(--ink); border:1.5px solid var(--line); border-radius:7px; padding:4px 9px; font-size:11px; font-weight:750; font-family:var(--sans); white-space:nowrap; box-shadow:0 4px 14px rgba(0,0,0,0.18); transition:opacity 0.08s ease; transform:translate(-50%,-100%)"></div>
 <div id="quadrantTooltip" class="quadrant-tooltip" style="opacity:0; pointer-events:none; position:absolute; z-index:12000; background:rgba(21,29,40,0.9); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); color:#fff; border:1px solid rgba(255,255,255,0.14); border-radius:10px; padding:10px 14px; font-size:11px; box-shadow:0 8px 24px rgba(0,0,0,0.25); font-family:var(--sans); transition:opacity 0.1s ease;"></div>
 
 <div id="volModal" class="vol-modal" role="dialog" aria-modal="true" aria-labelledby="volModalTitle">
@@ -610,6 +661,17 @@
 </div>
 
 <nav class="topnav" id="topnav">
+  <button class="nav-page active" data-page="overview">Dashboard</button>
+  <button class="nav-page" data-page="methodology">Methodology</button>
+  <span id="famNav" class="fam-nav">
+    <span class="fam-label" title="Scopes the detail modules only (§00.2–§02.1). §00.1, §02.2 and §03.1 are marked SYSTEM-WIDE / OWN GROUPING and do not follow this selector.">Detail modules · Process Category</span>
+    <span class="tab-strip" id="globalFamTabs" role="group" aria-label="Process family">
+      <button class="tab-btn active" data-gfam="testing">Testing</button>
+      <button class="tab-btn" data-gfam="cpp">CPP</button>
+      <button class="tab-btn" data-gfam="vendor">Vendor</button>
+      <button class="tab-btn" data-gfam="atm">ATM</button>
+    </span>
+  </span>
   <button id="themeToggle" class="theme-toggle" title="Toggle dark / light mode" aria-label="Toggle dark mode">
     <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/><g stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 1.2v2.6M12 20.2v2.6M1.2 12h2.6M20.2 12h2.6M4.4 4.4l1.85 1.85M17.75 17.75l1.85 1.85M4.4 19.6l1.85-1.85M17.75 6.25l1.85-1.85"/></g></svg>
     <svg class="moon-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M21.2 13.2A9.2 9.2 0 1 1 10.8 2.8a7.2 7.2 0 0 0 10.4 10.4Z"/></svg>
@@ -641,7 +703,7 @@
 <section style="margin-top:24px">
   <div class="sec-head">
     <span class="sec-num">00.1</span>
-    <h2>Executive Summary — Operations Dashboard</h2>
+    <h2>Executive Summary — Operations Dashboard <span class="scope-tag">system-wide</span></h2>
     <span class="sub">Key operational health indexes and total fraud benchmarks</span>
   </div>
   <div class="summary-deck" id="summaryDeck"></div>
@@ -660,20 +722,12 @@
       <div class="sn-body">
       Each bubble is a process, placed by two z-scores vs its own 30-day baseline —
       <b>horizontal</b> = AFPR (blocking behavior), <b>vertical</b> = Total Fraud&nbsp;$. Bubble size = decline volume.
-      The green <b>±2&sigma; box</b> is the stable zone; bubbles outside it are drifting. <b>Up</b> = fraud&nbsp;$ rising ·
+      The green box is a <b>±2&sigma; reference frame</b>, not the trigger boundary — actual triggers fire at
+      &plusmn;1.5&sigma; (and &minus;1&sigma; for bleed $, &minus;2&sigma; for dollar-drop), so an Action bubble can sit visually inside it. <b>Up</b> = fraud&nbsp;$ rising ·
       <b>right</b> = AFPR rising (more over-blocking) · <b>left</b> = AFPR falling (more fraud slipping through).
       Top-left = <b>Fraud Spike</b>, bottom-right = <b>Quality Bleed</b>. Click any bubble to drill into that process.
       </div>
     </details>
-    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px">
-      <div class="tab-strip" id="ccTabs">
-        <button class="tab-btn active" data-ccfam="testing">Testing</button>
-        <button class="tab-btn" data-ccfam="cpp">CPP</button>
-        <button class="tab-btn" data-ccfam="vendor">Vendor</button>
-        <button class="tab-btn" data-ccfam="atm">ATM</button>
-      </div>
-      <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.05em">AFPR Z × Total Fraud $ Z vs 30d baseline · per family</span>
-    </div>
     <div id="cmdVerdict" class="cmd-verdict"></div>
     <div class="cmd-grid">
       <div id="quadrantSvg"></div>
@@ -686,31 +740,29 @@
 <section>
   <div class="sec-head">
     <span class="sec-num">01.1</span>
-    <h2>Process Quality Cards — AFPR Control Band (±2σ) + 7d Movement</h2>
-    <span class="sub">compact view · click a card to expand Tier breakdown</span>
+    <h2>Process Quality Cards — Status &amp; AFPR Control Band (±2σ)</h2>
+    <span class="sub">scan view · click a card for 7d movement + tier breakdown</span>
   </div>
   <details class="scoring-note">
-    <summary>How to read — Health Score methodology</summary>
+    <summary>How to read — status logic</summary>
     <div class="sn-body">
-    The <b>Health Score (0–100)</b> starts at 100, then deducts by deviation state —
-    Attack &minus;50 &middot; Bleed &minus;35 &middot; Anomaly &minus;25 &middot; Early&#8209;signal &minus;15 — and &minus;5 for each
-    consecutive day AFPR stays &gt;1&sigma; off its 30&#8209;day mean
-    (<b style="color:var(--good)">&ge;90 healthy</b> &middot; <b style="color:var(--warn)">70&ndash;89 watch</b> &middot; <b style="color:var(--bad)">&lt;70 act</b>).
-    The <b>status dot</b> is <b style="color:var(--good)">green</b> when today's AFPR sits inside its 30&#8209;day &plusmn;2&sigma; control band,
-    <b style="color:var(--bad)">red</b> when it breaks out (<b>beyond 2&sigma;</b> = rule&#8209;level action).
-    AFPR = total accounts &divide; fraud accounts — higher means more over&#8209;blocking.
+    Each card carries <b>one status, shared with the §00.2 matrix</b> (same classification — the two can never disagree; the old 0–100 score is retired):
+    <b style="color:var(--bad)">ACTION · FRAUD SPIKE</b> (AFPR z &lt; &minus;1.5&sigma; and fraud $ z &gt; +1.5&sigma;) &middot;
+    <b style="color:var(--warn)">ACTION · QUALITY BLEED</b> (AFPR z &gt; +1.5&sigma; and fraud $ z &lt; &minus;1&sigma;) &middot;
+    <b>DATA CHECK · ANOMALY</b> (the two signals contradict — verify the feed before reading either) &middot;
+    <b style="color:var(--accent)">WATCH · EARLY SIGNAL</b> (one axis moved, the other still flat) &middot;
+    <b style="color:var(--accent)">WATCH · DOLLAR SPIKE</b> ($ z &ge; +1.5&sigma;, AFPR quiet) &middot;
+    <b>DATA CHECK · DOLLAR DROP</b> ($ z &le; &minus;2&sigma;, AFPR quiet — likely feed gap) &middot;
+    <b style="color:var(--good)">STABLE</b>.
+    Badges add context, not judgement: <b>SUSTAINED&nbsp;nD</b> / <b>DAY&nbsp;1</b> persistence &middot; <b>HIGH IMPACT</b> = top quartile by count (top K of N) of this process category's fraud $ &middot;
+    <b>LOW SAMPLE</b> = &lt;5 fraud accounts (ratios noisy) &middot; <b>HS&nbsp;N/A / V15&nbsp;N/A / ACCT&nbsp;N/A</b> = the specific pipeline feed that is missing (filters affected; core status is not).
+    AFPR = total accounts &divide; fraud accounts — higher means more over&#8209;blocking; the band shows today vs the 30&#8209;day &plusmn;2&sigma; range.
     </div>
   </details>
   <div class="panel">
-    <div class="tab-strip sub pf-tabs" style="margin-bottom:16px">
-      <button class="tab-btn active" data-pf="testing">Testing</button>
-      <button class="tab-btn" data-pf="cpp">CPP</button>
-      <button class="tab-btn" data-pf="vendor">Vendor</button>
-      <button class="tab-btn" data-pf="atm">ATM</button>
-    </div>
     <div class="kpi-legend">
-      <span><i class="swatch" style="background:var(--good)"></i>in band (within ±2σ)</span>
-      <span><i class="swatch" style="background:var(--bad)"></i>beyond 2σ (action)</span>
+      <span><i class="swatch" style="background:var(--good)"></i>inside AFPR ±2σ band</span>
+      <span><i class="swatch" style="background:var(--bad)"></i>outside AFPR ±2σ band</span>
       <span><i class="swatch" style="background:var(--band)"></i>±2σ control band</span>
       <span style="color:var(--ink-faint)">7d dual-axis: AFPR line (L) + total/fraud acct bars (R)</span>
     </div>
@@ -725,12 +777,6 @@
     <span class="sub">shares process selection with §01.3 Fraud $ below · click legend to toggle</span>
   </div>
   <div class="panel">
-    <div class="tab-strip sub pf-tabs" style="margin-bottom:16px">
-      <button class="tab-btn active" data-pf="testing">Testing</button>
-      <button class="tab-btn" data-pf="cpp">CPP</button>
-      <button class="tab-btn" data-pf="vendor">Vendor</button>
-      <button class="tab-btn" data-pf="atm">ATM</button>
-    </div>
     <div class="trend-controls" id="afprLegend"></div>
     <div class="trend-wrap">
       <div class="trend-chart">
@@ -748,12 +794,6 @@
     <span class="sec-num">01.3</span>
     <h2>Fraud $ — Total (Approved + Declined) · Tier Composition</h2>
     <span class="sub">shares process selection with §01.2 AFPR above · filter by High-Spender / 15-min-verified · top 3 shown</span>
-  </div>
-  <div class="tab-strip sub pf-tabs" style="margin-bottom:16px">
-    <button class="tab-btn active" data-pf="testing">Testing</button>
-    <button class="tab-btn" data-pf="cpp">CPP</button>
-    <button class="tab-btn" data-pf="vendor">Vendor</button>
-      <button class="tab-btn" data-pf="atm">ATM</button>
   </div>
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
     <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em">High-spender segment (both charts)</span>
@@ -803,12 +843,6 @@
     <span class="sub" id="ddSub">ranked by total fraud $</span>
   </div>
   <div class="panel">
-    <div class="tab-strip sub pf-tabs" style="margin-bottom:16px">
-      <button class="tab-btn active" data-pf="testing">Testing</button>
-      <button class="tab-btn" data-pf="cpp">CPP</button>
-      <button class="tab-btn" data-pf="vendor">Vendor</button>
-      <button class="tab-btn" data-pf="atm">ATM</button>
-    </div>
     <div class="dd-mode">
       <div class="seg-toggle" id="ddModeToggle">
         <button data-mode="total" class="active">By Total $</button>
@@ -837,12 +871,12 @@
 <section>
   <div class="sec-head">
     <span class="sec-num">02.2</span>
-    <h2>Follow-up Fraud Detail — 15d <span class="demo-tag">SYNTHETIC DEMO DATA</span></h2>
-    <span class="sub">per-source capture + tier-level approved-fraud AFPR · click a column to sort</span>
+    <h2>Follow-up Fraud Detail — 15d <span class="scope-tag">system-wide</span> <span class="demo-tag">SYNTHETIC DEMO DATA</span></h2>
+    <span class="sub">spans all process categories — independent of the topnav selector · click a column to sort</span>
   </div>
   <div class="panel">
     <div class="tab-strip sub" id="srcPerfTabs" style="margin-bottom:18px">
-      <button class="tab-btn active" data-fam="all">All Families</button>
+      <button class="tab-btn active" data-fam="all">All Categories</button>
       <button class="tab-btn" data-fam="testing">Testing / UDV</button>
       <button class="tab-btn" data-fam="cpp">CPP</button>
       <button class="tab-btn" data-fam="vendor">Vendor</button>
@@ -852,7 +886,7 @@
       <table class="vol-table" id="srcPerfTable">
         <thead><tr>
           <th data-k="name" style="text-align:left">Source</th>
-          <th data-k="fam">Family</th>
+          <th data-k="fam">Category</th>
           <th data-k="totAcct">Tot Acct</th>
           <th data-k="frdAcct">Frd Acct</th>
           <th data-k="fdlr">Fraud $</th>
@@ -875,8 +909,8 @@
 <section>
   <div class="sec-head">
     <span class="sec-num">03.1</span>
-    <h2>Process Volume Monitor — Today vs 30-Day Baseline</h2>
-    <span class="sub">data-health check · today / yesterday delta + volume Z-Score + 45-day trajectory · click a chart to enlarge</span>
+    <h2>Process Volume Monitor — Today vs 30-Day Baseline <span class="scope-tag">own grouping</span></h2>
+    <span class="sub">data-health check · own batch grouping, independent of the topnav selector · click a chart to enlarge</span>
   </div>
   <div class="panel">
     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px">
@@ -911,6 +945,21 @@
   </div>
 </section>
 </div><!-- /page-overview -->
+
+<!-- ============ PAGE 2: METHODOLOGY ============ -->
+<div id="page-methodology" class="page">
+<section style="margin-top:24px">
+  <div class="sec-head">
+    <span class="sec-num">M</span>
+    <h2>Methodology — Design Rationale</h2>
+    <span class="sub">why each module is built the way it is · pick a module below</span>
+  </div>
+  <div class="method-wrap">
+    <nav class="method-toc" id="methodChips" aria-label="Methodology contents"></nav>
+    <div id="methodBody"></div>
+  </div>
+</section>
+</div><!-- /page-methodology -->
 
 <div class="footnote" role="contentinfo">
   <b>Self-contained report</b> · Zero external dependencies (no CDN / no fetch / no &lt;script src&gt;); sendable as a Gmail .html attachment, openable via file://.<br>
@@ -1422,7 +1471,7 @@ let MERCHANTS = FAMS.testing.merchants;
 
 const $=s=>document.querySelector(s);
 // a11y: make click-driven elements keyboard-operable (Enter/Space -> click).
-function kbd(el,label){ el.tabIndex=0; el.setAttribute("role","button"); if(label) el.setAttribute("aria-label",label); el.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); el.click(); } }); }
+function kbd(el,label,expandable){ el.tabIndex=0; el.setAttribute("role","button"); if(label) el.setAttribute("aria-label",label); if(expandable) el.setAttribute("aria-expanded","false"); el.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); el.click(); } }); }
 const fmt$=n=> n>=1e6 ? "$"+(n/1e6).toFixed(2)+"M" : n>=1e3 ? "$"+(n/1e3).toFixed(0)+"K" : "$"+Math.round(n);
 const fmtK=n=> n>=1e3 ? (n/1e3).toFixed(n>=1e4?0:1)+"k" : ""+Math.round(n);
 // Real merchants carry hct_term_owner_id as mid; synthetic ones derive a stable fake MID.
@@ -1436,18 +1485,19 @@ function afprStatus(p){
 function miniCombo(p){
   // True dual-axis: LEFT axis = AFPR (line), RIGHT axis = account count (bars).
   // X axis = last 7 days (dated).
-  const W=240,H=80, padL=24, padR=28, padT=5, padB=16;
+  const W=300,H=128, padL=32, padR=38, padT=10, padB=24;
   const n=p.afpr7.length;
   const iw=W-padL-padR, ih=H-padT-padB;
   const aMax=Math.max(...p.afpr7)*1.18, aMin=Math.min(...p.afpr7)*0.82;
   const bMax=Math.max(...p.acct7.tot)*1.12;
   const gap=iw/n, bw=gap*0.56;
-  const days = DATES.slice(-7); // last 7 dates aligned to afpr7
-  let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px">`;
+  const days = procDates().slice(-7); // real dates for the CURRENT family (global DATES is synthetic-only)
+  // height:auto — a fixed px height letterboxed the chart inside its column (viewBox aspect != box aspect).
+  let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">`;
   // right-axis acct gridlines + labels (2 ticks)
   for(let g=0;g<=2;g++){ const v=bMax*g/2, yy=padT+ih-(v/bMax*ih);
     svg+=`<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W-padR}" y2="${yy.toFixed(1)}" stroke="var(--line)" stroke-width="0.6"/>`;
-    if(g>0) svg+=`<text x="${W-padR+3}" y="${(yy+3).toFixed(1)}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="9.5">${fmtK(v)}</text>`;
+    if(g>0) svg+=`<text x="${W-padR+4}" y="${(yy+3.5).toFixed(1)}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="10">${fmtK(v)}</text>`;
   }
   // account bars (total = grey, fraud = red overlay) against RIGHT axis
   p.acct7.tot.forEach((tt,i)=>{
@@ -1459,42 +1509,94 @@ function miniCombo(p){
   // AFPR line against LEFT axis
   const ax=i=>padL+gap*i+gap/2, ay=v=>padT+ih-((v-aMin)/(aMax-aMin)*ih);
   // left-axis AFPR labels (top & bottom)
-  svg+=`<text x="${padL-3}" y="${(ay(aMax*0.96)+3).toFixed(1)}" text-anchor="end" fill="${p.color}" font-family="var(--mono)" font-size="9.5">${(aMax*0.96).toFixed(0)}</text>`;
-  svg+=`<text x="${padL-3}" y="${(ay(aMin*1.05)+3).toFixed(1)}" text-anchor="end" fill="${p.color}" font-family="var(--mono)" font-size="9.5">${(aMin*1.05).toFixed(0)}</text>`;
+  svg+=`<text x="${padL-4}" y="${(ay(aMax*0.96)+3.5).toFixed(1)}" text-anchor="end" fill="${p.color}" font-family="var(--mono)" font-size="10">${(aMax*0.96).toFixed(0)}</text>`;
+  svg+=`<text x="${padL-4}" y="${(ay(aMin*1.05)+3.5).toFixed(1)}" text-anchor="end" fill="${p.color}" font-family="var(--mono)" font-size="10">${(aMin*1.05).toFixed(0)}</text>`;
   let d=p.afpr7.map((v,i)=>(i?"L":"M")+ax(i).toFixed(1)+" "+ay(v).toFixed(1)).join(" ");
-  svg+=`<path d="${d}" fill="none" stroke="${p.color}" stroke-width="1.8"/>`;
-  p.afpr7.forEach((v,i)=>{ svg+=`<circle cx="${ax(i).toFixed(1)}" cy="${ay(v).toFixed(1)}" r="2" fill="${p.color}"/>`; });
+  svg+=`<path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
+  p.afpr7.forEach((v,i)=>{ svg+=`<circle cx="${ax(i).toFixed(1)}" cy="${ay(v).toFixed(1)}" r="2.4" fill="${p.color}"/>`; });
   // X-axis date labels: first, middle, last day of the 7d window
-  [0,3,6].forEach(i=>{ if(days[i]) svg+=`<text x="${ax(i).toFixed(1)}" y="${H-4}" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--mono)" font-size="9.5">${days[i]}</text>`; });
+  [0,3,6].forEach(i=>{ if(days[i]) svg+=`<text x="${ax(i).toFixed(1)}" y="${H-6}" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--mono)" font-size="10">${days[i]}</text>`; });
   // axis caps (left=AFPR, right=acct)
-  svg+=`<text x="${padL-3}" y="${H-4}" text-anchor="end" fill="${p.color}" font-family="var(--mono)" font-size="7.5">AFPR</text>`;
-  svg+=`<text x="${W-padR+3}" y="${H-4}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="7.5">acct</text>`;
+  svg+=`<text x="${padL-4}" y="${H-6}" text-anchor="end" fill="${p.color}" font-family="var(--mono)" font-size="8.5">AFPR</text>`;
+  svg+=`<text x="${W-padR+4}" y="${H-6}" fill="var(--ink-faint)" font-family="var(--mono)" font-size="8.5">acct</text>`;
   svg+=`</svg>`;
   return svg;
 }
 function renderKPI(){
   const grid=$("#kpiGrid"); grid.innerHTML="";
   const maxA=Math.max(...PROCESSES.map(p=>Math.max(p.afpr,p.b2[1])))*1.12;
+  // HIGH IMPACT: strict top quartile BY COUNT — top K of N, K = max(1, round(N/4)).
+  // (A percentile-threshold version over-selected on small families: 9 procs → 3 instead of 2.)
+  const _hiK = Math.max(1, Math.round(PROCESSES.length / 4));
+  const _hiSet = new Set(PROCESSES.slice()
+    .sort((a,b)=>((DOLLAR_STATS[b.id]||{}).today||0)-((DOLLAR_STATS[a.id]||{}).today||0))
+    .slice(0,_hiK).map(q=>q.id));
   PROCESSES.forEach((p,idx)=>{
     const st=afprStatus(p);
-    const card=document.createElement("div"); card.className="kpi-card" + (st.label==="beyond 2σ" ? " alert" : ""); card.dataset.idx=idx;
     const pct=v=>Math.max(0,Math.min(100,v/maxA*100));
+    // Fraud $ track. AFPR shares one 0..maxA scale across every card because AFPR is a RATE with a
+    // narrow cross-process spread (~4-9x). Fraud $ is a MAGNITUDE spanning 2-3 orders of magnitude
+    // across processes (766x inside Testing), so a shared scale would flatten small processes into
+    // an invisible sliver. Each card therefore draws its own 0..max and PRINTS that max, so the
+    // reader always knows the ruler they are reading. Compare deviation, not bar position.
+    const dTrack=(()=>{
+      const dsx=DOLLAR_STATS[p.id];
+      if(!dsx || !isFinite(dsx.mu) || !isFinite(dsx.sd) || dsx.sd<=0)
+        return {html:`<div class="afpr-scale" style="margin-top:9px"><span>Fraud $ baseline not available</span></div>`};
+      const hi=dsx.mu+2*dsx.sd, lo=Math.max(0,dsx.mu-2*dsx.sd);
+      const dMax=Math.max(dsx.today||0, hi)*1.08 || 1;
+      const dp=v=>Math.max(0,Math.min(100,v/dMax*100));
+      const dCol=Math.abs(dsx.z)>=2?"var(--bad)":"var(--good)";
+      return {html:`
+      <div class="afpr-track t2">
+        <div class="afpr-axis"></div>
+        <div class="afpr-band2" style="left:${dp(lo)}%;width:${(dp(hi)-dp(lo)).toFixed(2)}%"></div>
+        <div class="afpr-center" style="left:${dp(dsx.mu)}%"></div>
+        <div class="afpr-mark" style="left:${dp(dsx.today||0)}%;background:${dCol}"></div>
+      </div>
+      <div class="afpr-scale"><span>0</span><span>Fraud $ <b style="color:${dCol}">${fmt$(dsx.today||0)}</b> · μ${fmt$(dsx.mu)}</span><span>${fmt$(dMax)}</span></div>`};
+    })();
     const afpr7delta = p.afpr7[6]-p.afpr7[0];
-    const cKind = classify(p).kind;
-    // "Today" is the last index of afprHist (now length 75 — was 45 prior to cold-start fix).
-    const healthScore = calculateCompositeScore(cKind, p.afprHist.length - 1, p);
-    let scoreClass = "score-green";
-    if (healthScore < 70) scoreClass = "score-bad";
-    else if (healthScore < 90) scoreClass = "score-warn";
-    
+    // ONE status per card, shared with the §00.2 matrix (same classify()) — no separate score,
+    // no second status dot: the card can never disagree with the matrix.
+    const c = classify(p);
+    const streak = afprStreak(p);
+    const ds = DOLLAR_STATS[p.id] || { today: 0 };
+    const STATUS = {
+      attack:         { txt: "ACTION · FRAUD SPIKE",  col: "var(--bad)"    },
+      bleed:          { txt: "ACTION · QUALITY BLEED",col: "var(--warn)"   },
+      anomaly:        { txt: "DATA CHECK · ANOMALY",  col: "var(--ink-dim)"},
+      "dlr-drop":     { txt: "DATA CHECK · DOLLAR DROP", col: "var(--ink-dim)"},
+      "dlr-spike":    { txt: "WATCH · DOLLAR SPIKE",  col: "var(--accent)" },
+      "early-attack": { txt: "WATCH · EARLY SIGNAL",  col: "var(--accent)" },
+      "early-bleed":  { txt: "WATCH · EARLY SIGNAL",  col: "var(--accent)" },
+      stable:         { txt: "STABLE",                col: "var(--good)"   },
+    }[c.kind];
+    const KCLASS = { attack:" k-attack", bleed:" k-bleed", anomaly:" k-check", "dlr-drop":" k-check",
+                     "dlr-spike":" k-watch", "early-attack":" k-watch", "early-bleed":" k-watch", stable:"" }[c.kind];
+    const card=document.createElement("div"); card.className="kpi-card" + KCLASS; card.dataset.idx=idx;
+    // context badges — information, not judgement
+    const badges=[];
+    // context badges are neutral-coloured on purpose: persistence and scale are facts, not verdicts
+    if (c.kind !== "stable" && streak >= 1) badges.push(streak >= 2 ? [`SUSTAINED ${streak}D`, "b-persist", `${streak} consecutive days beyond 1σ`] : ["DAY 1", "b-persist", "first day beyond 1σ"]);
+    if ((ds.today || 0) > 0 && _hiSet.has(p.id)) badges.push(["HIGH IMPACT", "b-scale", `top quartile of ${CC_FAM_LABEL[procFam]||"category"} fraud $ (top ${_hiK} of ${PROCESSES.length})`]);
+    if ((p.frd || 0) < 5) badges.push(["LOW SAMPLE", "b-dim", "fewer than 5 fraud accounts in window — ratios noisy"]);
+    // Specific missing-feed badges: these disable their filter/overlay only — the core
+    // classification uses TOT_ACCT / FRAUD_ACCT / FRAUD_DLR and is unaffected.
+    if (!famHas("hsAvail"))   badges.push(["HS N/A",   "b-dim", "High-Spender split not provided — HS filter disabled; core status unaffected"]);
+    if (!famHas("v15Avail"))  badges.push(["V15 N/A",  "b-dim", "15-min-verified split not provided — verified carve-out disabled; core status unaffected"]);
+    if (!famHas("acctAvail")) badges.push(["ACCT N/A", "b-dim", "Tier fraud-account series not provided — account overlay disabled; core status unaffected"]);
+    const badgeHtml = badges.length ? `<div class="kpi-badges">${badges.map(([t,cls,tip])=>`<span class="kbadge ${cls}"${tip?` title="${tip}"`:""}>${t}</span>`).join("")}</div>` : "";
+    const fz = z => (z >= 0 ? "+" : "") + z.toFixed(2);
+    const zAcol = c.zA <= -Z_AFPR_STRONG ? "var(--bad)" : c.zA >= Z_AFPR_STRONG ? "var(--warn)" : "var(--ink)";
+    const zDcol = c.zD >=  Z_DLR_STRONG  ? "var(--bad)" : "var(--ink)";
+
     card.innerHTML=`
       <div class="kpi-name">
         <span>${p.short}</span>
-        <span style="display:flex;align-items:center;gap:8px;">
-          <span class="health-badge ${scoreClass}">Score: ${healthScore}</span>
-          <span class="status-dot" style="background:${st.c}"></span>
-        </span>
+        <span class="kpi-status" style="color:${STATUS.col}">${STATUS.txt}</span>
       </div>
+      ${badgeHtml}
       <div class="afpr-track">
         <div class="afpr-axis"></div>
         <div class="afpr-band2" style="left:${pct(p.b2[0])}%;width:${pct(p.b2[1])-pct(p.b2[0])}%"></div>
@@ -1502,26 +1604,37 @@ function renderKPI(){
         <div class="afpr-mark" style="left:${pct(p.afpr)}%;background:${st.c}"></div>
       </div>
       <div class="afpr-scale"><span>0</span><span>AFPR <b style="color:${st.c}">${p.afpr}</b> · μ${p.mu}</span><span>${maxA.toFixed(0)}</span></div>
-      <div class="mini-combo">
-        <div class="lbl"><span>7d AFPR ${afpr7delta>=0?'▲':'▼'} ${Math.abs(afpr7delta).toFixed(1)}</span><span>■ tot ■ <span style="color:var(--bad)">frd</span> acct</span></div>
-        ${miniCombo(p)}
+      ${dTrack.html}
+      <div class="kpi-decision">
+        <span>AFPR</span><b style="color:${zAcol}">${fz(c.zA)}σ</b>
+        <span>Fraud $</span><b style="color:${zDcol}">${fz(c.zD)}σ</b>
+        <span>${streak > 0 ? "Day " + streak : "No streak"}</span><b>${fmt$(ds.today || 0)} · ${fmtK(p.tot)} accts</b>
       </div>
-      <div class="kpi-val"><span>TFPR <b>${p.tfpr}</b></span><span>DFPR <b>${p.dfpr.toFixed(1)}</b></span><span>2σ <b>${p.b2[0]}–${p.b2[1]}</b></span></div>`;
+      <div class="expand-hint">7d trend + tier breakdown \u203a</div>`;
     card.onclick=()=>toggleTier(idx,card);
-    kbd(card, p.short + " — open tier breakdown");
+    kbd(card, p.short + " — open tier breakdown", true);
     grid.appendChild(card);
   });
 }
 let openDrawer=null;
 function toggleTier(idx,card){
-  document.querySelectorAll(".kpi-card").forEach(c=>c.classList.remove("open"));
+  document.querySelectorAll(".kpi-card").forEach(c=>{ c.classList.remove("open"); c.setAttribute("aria-expanded","false"); });
   if(openDrawer){ const was=openDrawer.dataset.for; openDrawer.remove(); openDrawer=null; if(was==idx) return; }
-  card.classList.add("open");
+  card.classList.add("open"); card.setAttribute("aria-expanded","true");
   const p=PROCESSES[idx];
   const dr=document.createElement("div"); dr.className="tier-drawer open"; dr.dataset.for=idx;
   const rows=p.tiers.map(t=>`<tr><td><span class="pill" style="background:color-mix(in srgb, ${TIER_COLORS[t.t]} 13%, transparent);color:${TIER_COLORS[t.t]}">${t.t}</span></td><td class="num">${t.afpr}</td><td class="num">${t.tot.toLocaleString()}</td><td class="num">${t.frd}</td><td class="num">${fmt$(t.fdlr)}</td></tr>`).join("");
-  dr.innerHTML=`<div class="tier-inner"><h4>${p.short} — Tier breakdown</h4>
-    <table><thead><tr><th>Tier</th><th>AFPR</th><th>Tot Acct</th><th>Frd Acct</th><th>Fraud $</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  // The 7d chart lives here, not on the card: this drawer is full-width and inserted AFTER the
+  // clicked card's ROW, so expanding never changes any card's height or moves its row-mates.
+  const d7=p.afpr7[6]-p.afpr7[0];
+  dr.innerHTML=`<div class="tier-inner"><h4>${p.short} — 7d movement &amp; tier breakdown</h4>
+    <div class="drawer-grid">
+      <div class="mini-combo" style="margin-top:0;border-top:0;padding-top:0">
+        <div class="lbl"><span>7d AFPR ${d7>=0?'\u25b2':'\u25bc'} ${Math.abs(d7).toFixed(1)}</span><span>\u25a0 tot \u25a0 <span style="color:var(--bad)">frd</span> acct</span></div>
+        ${miniCombo(p)}
+      </div>
+      <table><thead><tr><th>Tier</th><th>AFPR</th><th>Tot Acct</th><th>Frd Acct</th><th>Fraud $</th></tr></thead><tbody>${rows}</tbody></table>
+    </div></div>`;
   // Insert the drawer AFTER the LAST card on the clicked card's row, so that row's cards
   // stay put (no gap, no reflow within the row); only rows below shift down for the drawer.
   const _cards=[...document.querySelectorAll(".kpi-card")];
@@ -1546,7 +1659,7 @@ function setHsSeg(seg){
 }
 function syncFilterAvailability(){
   const hsOk=famHas("hsAvail");
-  document.querySelectorAll("[data-hs]").forEach(b=>{ b.disabled=!hsOk; b.style.opacity=hsOk?"":"0.4"; b.style.cursor=hsOk?"":"not-allowed"; b.title = hsOk ? "" : "High-Spender breakdown not provided by the pipeline for this family"; });
+  document.querySelectorAll("[data-hs]").forEach(b=>{ b.disabled=!hsOk; b.style.opacity=hsOk?"":"0.4"; b.style.cursor=hsOk?"":"not-allowed"; b.title = hsOk ? "" : "High-Spender breakdown not provided by the pipeline for this process category"; });
   if(!hsOk && hsSeg!=="all"){ hsSeg="all"; document.querySelectorAll("[data-hs]").forEach(x=>{ const on=x.dataset.hs==="all"; x.classList.toggle("active",on); x.setAttribute("aria-pressed",on); }); }
   if(!hsOk && tfMode==="hssplit") tfMode="process";   // HS-split needs HS data
   if(!famHas("v15Avail")) excludeV15=false;
@@ -1622,7 +1735,7 @@ function renderLegend(){
     v15btn.className="cadence-toggle"+(excludeV15?" on":"");
     v15btn.innerHTML=`<span class="box">${excludeV15?"✓":""}</span>Exclude 15-min verified`;
     v15btn.title="Drop policy-must-approve (15-min verified) $ on T2/T3 → shows only rule-declinable approved fraud";
-    if(!famHas("v15Avail")){ v15btn.disabled=true; v15btn.style.opacity="0.4"; v15btn.style.cursor="not-allowed"; v15btn.title="15-min-verified $ not provided by the pipeline for this family"; }
+    if(!famHas("v15Avail")){ v15btn.disabled=true; v15btn.style.opacity="0.4"; v15btn.style.cursor="not-allowed"; v15btn.title="15-min-verified $ not provided by the pipeline for this process category"; }
     v15btn.onclick=()=>{ if(v15btn.disabled) return; excludeV15=!excludeV15; renderLegend(); drawTrend(); updateFilterBadges(); };
     wrap.appendChild(v15btn);
     // T1 has no 15-min verification (verification precedes tier 2/3) — surface it right next to the
@@ -1663,7 +1776,7 @@ function drawTrend(){
       const d=s.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)).join(" ");
       svg+=`<path d="${d}" fill="none" stroke="${p.color}" stroke-width="1.6" opacity="0.92"/><circle cx="${x(NDAYS-1)}" cy="${y(s[NDAYS-1])}" r="2.6" fill="${p.color}"/>`;
     });
-    hoverCfg={ dateAt:i=>procDates()[i], rowsAt:i=>PROCESSES.filter(p=>visible.has(p.id)).map(p=>{ const s=procSum(p.id).map((v,j)=>v*hsMul(p.id,j)); return {label:p.short,color:p.color,value:fmt$(s[i]),y:y(s[i])}; }) };
+    hoverCfg={ dateAt:i=>procDates()[i], rowsAt:i=>PROCESSES.filter(p=>visible.has(p.id)).map(p=>{ const s=procSum(p.id).map((v,j)=>v*hsMul(p.id,j)); return {label:p.short,color:p.color,value:fmt$(s[i]),y:y(s[i])}; }).sort((a,b)=>a.y-b.y) };  // tooltip rows top-line-first, matching the chart
   } else {
     // stacked tier area for one process, WITH a fraud-account context layer (bars, secondary scale)
     const p=PROCESSES.find(x=>x.id===tierFocus)||PROCESSES[0];
@@ -1787,7 +1900,7 @@ const ddHasSplit=()=> MERCHANTS.some(m=>m.fdlrApr!=null && m.fdlrDcl!=null);
 // Enable the Total/Approved/Declined toggle only when the pipeline supplied the split — never fabricate.
 function syncDdDlrAvailability(){
   const ok=ddHasSplit();
-  document.querySelectorAll("#ddDlrToggle button").forEach(b=>{ b.disabled=!ok; b.style.opacity=ok?"":"0.4"; b.style.cursor=ok?"":"not-allowed"; b.title=ok?"":"approved/declined split not provided by the pipeline for this family"; });
+  document.querySelectorAll("#ddDlrToggle button").forEach(b=>{ b.disabled=!ok; b.style.opacity=ok?"":"0.4"; b.style.cursor=ok?"":"not-allowed"; b.title=ok?"":"approved/declined split not provided by the pipeline for this process category"; });
   if(!ok && ddDlrView!=="all"){ ddDlrView="all"; }
   document.querySelectorAll("#ddDlrToggle button").forEach(b=>{ const on=b.dataset.ddv===ddDlrView; b.classList.toggle("active",on); b.setAttribute("aria-pressed",on); });
 }
@@ -1806,10 +1919,12 @@ function ddRowHtml(m, max){
     ? `<span class="dd-bar" title="Approved ${fmt$(m.fdlrApr)} · Declined ${fmt$(m.fdlrDcl)}"><i style="width:${(w*(m.fdlr?m.fdlrApr/m.fdlr:0)).toFixed(1)}%;background:var(--tf-approved);opacity:.85"></i><i style="width:${(w*(m.fdlr?m.fdlrDcl/m.fdlr:0)).toFixed(1)}%;background:var(--tf-declined);opacity:.7"></i></span>`
     : `<span class="dd-bar"><i style="width:${w.toFixed(1)}%;background:${ddDlrView==="apr"?"var(--tf-approved)":ddDlrView==="dcl"?"var(--tf-declined)":"var(--tf-hs)"};opacity:.75"></i></span>`;
   const frdV=ddFrdOf(m);
+  const dclRate = (m.fdlrDcl!=null && m.fdlr) ? (m.fdlrDcl/m.fdlr*100) : null;
   return `<td><span class="dd-mname">${m.name}</span><span class="dd-mid" title="Merchant identifier">${getMid(m)}</span></td>
     <td class="dd-dlr">${fmt$(v)}</td>
     <td>${bar}</td>
     <td class="dd-rate ${rateCls(m.rate)}">${m.rate}%</td>
+    <td>${dclRate==null?"—":dclRate.toFixed(0)+"%"}</td>
     <td>${frdV==null?"—":frdV.toLocaleString()}</td>`;
 }
 function renderDDTotal(){
@@ -1861,7 +1976,7 @@ function renderDDTotal(){
   
   // 3. Render as a compact sortable table (scan-first; the old fat colored bars encoded $ in
   // length and rate in color simultaneously — the two fought. Now: slate bar = $, rate = column.)
-  const sortVal=(m,k)=> k==="fdlr" ? ddDlrOf(m) : k==="frd" ? (ddFrdOf(m)||0) : (m[k]||0);
+  const sortVal=(m,k)=> k==="fdlr" ? ddDlrOf(m) : k==="frd" ? (ddFrdOf(m)||0) : k==="dclr" ? ((m.fdlrDcl!=null&&m.fdlr)?m.fdlrDcl/m.fdlr:0) : (m[k]||0);
   list.sort((a,b)=>(sortVal(a,ddSort.k)-sortVal(b,ddSort.k))*ddSort.dir);
   const max=Math.max(...list.map(ddDlrOf)) || 1;
 
@@ -1873,6 +1988,20 @@ function renderDDTotal(){
     ddSel = null;
     $("#ddDetail").innerHTML = '<div class="dd-hint">No merchant to show for this filter.</div>';
   } else {
+    // Approved/Declined lens: state the share up front. Vendor-type categories decline most
+    // fraud at auth, so the approved list is legitimately small-$ — without this line the
+    // reader assumes the ranking is broken rather than the block rate being high.
+    if(ddDlrView!=="all" && ddHasSplit()){
+      const sumTot=list.reduce((a,m)=>a+(m.fdlr||0),0);
+      const sumView=list.reduce((a,m)=>a+ddDlrOf(m),0);
+      const pctV=sumTot?Math.round(sumView/sumTot*100):0;
+      const note=document.createElement("div"); note.className="dd-hint";
+      note.style.marginBottom="8px";
+      note.innerHTML = ddDlrView==="apr"
+        ? `Approved <b>${fmt$(sumView)}</b> = <b>${pctV}%</b> of ${fmt$(sumTot)} total fraud $ across listed merchants — the other ${100-pctV}% was declined at auth.`
+        : `Declined <b>${fmt$(sumView)}</b> = <b>${pctV}%</b> of ${fmt$(sumTot)} total fraud $ across listed merchants.`;
+      wrap.appendChild(note);
+    }
     // Default the right pane to the top-$ merchant when nothing valid is selected,
     // so the detail never sits on the "click a merchant" hint.
     const topByDlr = list.slice().sort((a,b)=>ddDlrOf(b)-ddDlrOf(a))[0];
@@ -1885,6 +2014,7 @@ function renderDDTotal(){
       <th data-k="fdlr" class="${sortCls('fdlr')}">${dlrHead}</th>
       <th></th>
       <th data-k="rate" class="${sortCls('rate')}" title="Txn fraud rate = fraud transactions ÷ all transactions of this merchant in the window">Fraud Rate</th>
+      <th data-k="dclr" class="${sortCls('dclr')}" title="Decline rate = declined fraud $ ÷ total fraud $ (approved + declined)">Decl %</th>
       <th data-k="frd" class="${sortCls('frd')}">Frd Accts</th>
     </tr></thead>`;
     tbl.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{
@@ -2020,12 +2150,16 @@ function renderDDProcess(){
     host.appendChild(grp);
   });
 }
+function ddSubText(){
+  const basis = ddDlrView==="apr" ? "approved fraud $" : ddDlrView==="dcl" ? "declined fraud $" : "total fraud $";
+  return ddMode==="total" ? `ranked by ${basis}` : `grouped by source process, processes ranked by ${basis}`;
+}
 function setDDMode(mode){
   ddMode=mode;
   $("#ddModeToggle").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));
   $("#ddTotal").style.display = mode=="total"?"block":"none";
   $("#ddProcess").style.display = mode=="process"?"block":"none";
-  $("#ddSub").textContent = mode=="total"?"ranked by total fraud $":"grouped by source process, processes ranked by fraud $";
+  $("#ddSub").textContent = ddSubText();
   $("#ddModeHint").textContent = mode=="total"?"Rate = fraud txns ÷ all txns in window":"per-process attribution — a merchant hit by several processes appears under each; $ not additive across processes";
   if(mode=="process") renderDDProcess();
 }
@@ -2186,7 +2320,7 @@ function drawAfpr(){
       const mapped=afprMetric==="zscore"?(v-p.mu)/(p.sd||1):v;
       const valStr=afprMetric==="zscore"?`${mapped>=0?"+":""}${mapped.toFixed(2)}σ`:`${v.toFixed(1)}`;
       return {label:p.short,color:p.color,value:valStr,y:y(mapped)};
-    })});
+    }).sort((a,b)=>a.y-b.y)});   // tooltip rows in visual (top-to-bottom) line order
 
   if (afprMetric === "zscore") {
     $("#afprNote").innerHTML=`<span style="color:var(--ink-faint)"><b>Z-Score (Normalized Deviation)</b>: Standardized deviation of daily AFPR from its 30d mean. All processes are mapped to standard deviation units (σ), resolving baseline scale differences. Values beyond ±2σ exceed control limits.</span>`;
@@ -2231,37 +2365,8 @@ function renderAfprSpark(){
 /* ---------- MODULE 00: OPERATIONS COMMAND CENTER ---------- */
 // DOLLAR_STATS now comes from the family factory (FAMS[*].dollarStats, swapped by setProcFam).
 
-// v8 Mathematical Helpers: Composite Health Scores & Daily Classifications
-function calculateCompositeScore(kind, dayIdx, p) {
-  let score = 100;
-  if (kind === "attack") score -= 50;
-  else if (kind === "bleed") score -= 35;
-  else if (kind === "anomaly") score -= 25;
-  else if (kind === "early-attack" || kind === "early-bleed") score -= 15;
-  
-  // Calculate rolling streak up to dayIdx. Lower bound 30 ensures each baseline used in the
-  // look-back has a full 30d prior window (afprHist is 75 long, indices 30..74 are stable).
-  let streak = 0;
-  if (dayIdx >= 30) {
-    const startIdx = Math.max(0, dayIdx - 30);
-    const baseline = p.afprHist.slice(startIdx, dayIdx);
-    const mu = mean(baseline);
-    const todaySign = Math.sign(p.afprHist[dayIdx] - mu);
-    if (todaySign !== 0) {
-      for (let i = dayIdx; i >= dayIdx - 30 && i >= 30; i--) {
-        const loopStartIdx = Math.max(0, i - 30);
-        const hist30 = p.afprHist.slice(loopStartIdx, i);
-        const m = mean(hist30);
-        const sd = std(hist30) || 1;
-        const z = (p.afprHist[i] - m) / sd;
-        if (Math.sign(z) === todaySign && Math.abs(z) > 1) streak++;
-        else break;
-      }
-    }
-  }
-  score -= streak * 5;
-  return Math.max(5, score);
-}
+// (calculateCompositeScore retired — 01.1 shows the shared classification directly instead of
+// re-encoding it into an uncalibrated 0–100 score.)
 
 // AFPR persistence streak: consecutive most-recent days where same-sign Z and |Z|>1
 function afprStreak(p) {
@@ -2288,6 +2393,11 @@ function classifyZ(zA, zD) {
   // Contradictory: AFPR says fraud surging but $ also dropping, or vice versa → data check
   if (zA < -Z_AFPR_STRONG && zD < -Z_DLR_BLEED)   return "anomaly";
   if (zA >  Z_AFPR_STRONG && zD >  Z_DLR_STRONG)  return "anomaly";
+  // Dollar-only signals (AFPR quiet): a hard $ move without blocking-behavior confirmation.
+  // Spike fires at the same +1.5σ the attack rule uses; drop needs −2.0σ (stricter than bleed's
+  // −1.0σ because there is no AFPR confirmation and $ is zero-bounded, so downside is noisy).
+  if (zD >=  Z_DLR_STRONG)                        return "dlr-spike";
+  if (zD <= -2.0)                                 return "dlr-drop";
   // Early signals: only one axis tripped
   if (zA < -1.0 && Math.abs(zD) <= Z_DLR_STRONG)  return "early-attack";
   if (zA >  1.0 && Math.abs(zD) <= Z_DLR_BLEED )  return "early-bleed";
@@ -2321,9 +2431,9 @@ window.ccBubbleClick = function(id) {
   focusProcessFromBubble(id);
 };
 
-/* ---- §01–§03 family switch ----
-   One shared family state for Quality Cards, AFPR multi-line, Fraud Trend and Drill-down:
-   the four sections' tab strips (.pf-tabs) stay in sync, since the modules share data. */
+/* ---- §00.2–§02.1 family switch ----
+   One shared family state driven by the single topnav selector (#globalFamTabs), since these
+   modules all read the same per-family data. §02.2 and §03.1 have their own groupings and opt out. */
 let procFam = "testing";
 function setProcFam(f, anchorEl) {
   if (f === procFam) return;
@@ -2334,16 +2444,23 @@ function setProcFam(f, anchorEl) {
   // Re-rendering changes section heights above the clicked tab (9 vs 20 processes), which
   // would shift the page under the cursor. Record the clicked element's viewport offset and
   // restore it after the re-render so the view stays pinned to where the user clicked.
+  // The family selector now lives in the sticky topnav, so there is no per-module anchor to pin.
+  // Instead pin the section the reader is currently looking at: family switches change section
+  // heights (9 vs 20 processes), which would otherwise slide the page under them.
+  if (!anchorEl) {
+    const line = window.scrollY + window.innerHeight * 0.33;
+    const secs = [...document.querySelectorAll(".page.active section")];
+    anchorEl = secs.filter(x => x.offsetTop <= line).pop() || secs[0] || null;
+  }
   const anchorTop = anchorEl ? anchorEl.getBoundingClientRect().top : null;
   // reset per-section view state to sensible defaults for the new family
   visible.clear();     PROCESSES.slice().sort((a, b) => b.fdlr - a.fdlr).slice(0, 3).forEach(p => visible.add(p.id));
   // afprVisible === tfVisible === visible (§01.2 AFPR + §01.3 Fraud $ share one selection) — reset above covers all three.
   tierFocus = null; trendTierFilter = "all"; ddSel = null; ddProcessFilter = "all"; ddDlrView = "all"; ddListExpanded = false;
   if (openDrawer) { openDrawer.remove(); openDrawer = null; }
-  document.querySelectorAll(".pf-tabs .tab-btn").forEach(b => b.classList.toggle("active", b.dataset.pf === f));
-  // keep §00.1 Command Center on the same family (all four sections now share one family state)
+  // one selector drives every family-scoped module (§00.2 / §01.1 / §01.2 / §01.3 / §02.1)
   ccFam = f;
-  document.querySelectorAll("#ccTabs .tab-btn").forEach(b => b.classList.toggle("active", b.dataset.ccfam === f));
+  document.querySelectorAll("#globalFamTabs .tab-btn").forEach(b => b.classList.toggle("active", b.dataset.gfam === f));
   drawCommandCenter(); renderVerdict(); renderAlerts();
   renderKPI();
   renderAfprLegend(); drawAfpr();
@@ -2391,7 +2508,7 @@ function drawCommandCenter() {
   svg += `<rect x="${xLeft.toFixed(1)}" y="${yTop.toFixed(1)}" width="${boxW.toFixed(1)}" height="${boxH.toFixed(1)}" fill="rgba(26,127,55,0.04)" stroke="var(--good)" stroke-width="1.3" stroke-dasharray="3 3" opacity="0.8" rx="4"/>`;
   
   // Clean "STABLE ZONE (±2σ)" label in the upper corner of the stable box
-  svg += `<text x="${(xLeft + 8).toFixed(1)}" y="${(yTop + 14).toFixed(1)}" fill="var(--good)" font-family="var(--sans)" font-size="9.5" font-weight="750" opacity="0.85">STABLE ZONE (±2σ)</text>`;
+  svg += `<text x="${(xLeft + 8).toFixed(1)}" y="${(yTop + 14).toFixed(1)}" fill="var(--good)" font-family="var(--sans)" font-size="9.5" font-weight="750" opacity="0.85">±2σ REFERENCE</text>`;
 
   // Quadrant labels — single line each (sublines removed to cut clutter; axis titles carry the
   // directional meaning). The two actionable quadrants are bold; the other two are faint.
@@ -2426,6 +2543,8 @@ function drawCommandCenter() {
     if (p.kind === "attack")        { fill = "var(--bad)";   op = 0.92; stroke = "#fff"; sw = 1.5; }
     else if (p.kind === "bleed")    { fill = "var(--warn)";  op = 0.92; stroke = "#fff"; sw = 1.5; }
     else if (p.kind === "anomaly")  { fill = "var(--ink-dim)"; op = 0.85; stroke = "var(--bad)"; sw = 1.4; }
+    else if (p.kind === "dlr-spike")    { fill = "var(--accent)"; op = 0.85; stroke = "var(--bad)"; sw = 1.3; }
+    else if (p.kind === "dlr-drop")     { fill = "var(--ink-dim)"; op = 0.7; }
     else if (p.kind === "early-attack") { fill = "var(--accent)"; op = 0.75; }
     else if (p.kind === "early-bleed")  { fill = "var(--early-bleed)";       op = 0.65; }
 
@@ -2467,27 +2586,33 @@ function renderVerdict() {
   if (!el) return;
   const items = ccItems();
   const famLabel = CC_FAM_LABEL[ccFam] || String(ccFam).toUpperCase();
-  const counts = { attack: 0, bleed: 0, anomaly: 0, "early-attack": 0, "early-bleed": 0 };
+  const counts = { attack: 0, bleed: 0, anomaly: 0, "dlr-spike": 0, "dlr-drop": 0, "early-attack": 0, "early-bleed": 0 };
   items.forEach(p => { if (p.kind in counts) counts[p.kind]++; });
-  const action = counts.attack + counts.bleed + counts.anomaly;
-  const watch = counts["early-attack"] + counts["early-bleed"];
+  // Three groups: ACTION = attack+bleed only; DATA CHECK = anomaly + dollar-drop (verify the feed,
+  // don't act on rules); WATCH = early signals + dollar-only spikes.
+  const action = counts.attack + counts.bleed;
+  const check  = counts.anomaly + counts["dlr-drop"];
+  const watch  = counts["early-attack"] + counts["early-bleed"] + counts["dlr-spike"];
 
   const chips = [];
   if (counts.attack)  chips.push(`<span class="cmd-chip attack">${counts.attack} Spike</span>`);
   if (counts.bleed)   chips.push(`<span class="cmd-chip bleed">${counts.bleed} Bleed</span>`);
-  if (counts.anomaly) chips.push(`<span class="cmd-chip anomaly">${counts.anomaly} Anomaly</span>`);
-  if (watch)          chips.push(`<span class="cmd-chip watch">${watch} Early watch</span>`);
+  if (check)          chips.push(`<span class="cmd-chip anomaly">${check} Data check</span>`);
+  if (watch)          chips.push(`<span class="cmd-chip watch">${watch} Watch</span>`);
 
   let lead, cls;
   if (action > 0) {
     cls = "crit";
     lead = `<span style="color:var(--bad)">ATTENTION: ${action} of ${items.length} ${famLabel} process${action > 1 ? "es" : ""} require action</span>`;
+  } else if (check > 0) {
+    cls = "";
+    lead = `<span style="color:var(--ink-dim)">${famLabel}: no action — ${check} data check${check > 1 ? "s" : ""} to verify</span>`;
   } else if (watch > 0) {
     cls = "";
-    lead = `<span style="color:var(--accent)">${famLabel}: no action items — ${watch} early watch${watch > 1 ? "es" : ""} to monitor</span>`;
+    lead = `<span style="color:var(--accent)">${famLabel}: no action items — ${watch} watch${watch > 1 ? "es" : ""} to monitor</span>`;
   } else {
     cls = "clear";
-    lead = `<span style="color:var(--good)">STABLE: All ${items.length} ${famLabel} processes stable — inside ±1.5σ bands</span>`;
+    lead = `<span style="color:var(--good)">STABLE: All ${items.length} ${famLabel} processes stable — no trigger thresholds crossed</span>`;
   }
   el.className = "cmd-verdict " + cls;
   el.innerHTML = `<span class="cmd-verdict-lead">${lead}</span><span class="cmd-verdict-chips">${chips.join("")}</span>`;
@@ -2496,31 +2621,29 @@ function renderVerdict() {
 function renderAlerts() {
   const container = $("#alertList");
   container.innerHTML = "";
-  const critical = [], watch = [];
+  const action = [], check = [], watch = [];
 
   ccItems().forEach(p => {
-    if (p.kind === "attack" || p.kind === "bleed" || p.kind === "anomaly") {
-      critical.push({ kind: p.kind, zA: p.zA, zD: p.zD, p, streak: p.streak });
-    } else if (p.kind === "early-attack" || p.kind === "early-bleed") {
-      watch.push({ kind: p.kind, zA: p.zA, zD: p.zD, p });
-    }
+    const rec = { kind: p.kind, zA: p.zA, zD: p.zD, p, streak: p.streak };
+    if (p.kind === "attack" || p.kind === "bleed") action.push(rec);
+    else if (p.kind === "anomaly" || p.kind === "dlr-drop") check.push(rec);
+    else if (p.kind === "early-attack" || p.kind === "early-bleed" || p.kind === "dlr-spike") watch.push(rec);
   });
-  // ordering within critical: attack > bleed > anomaly, then by magnitude
-  const ord = { attack: 0, bleed: 1, anomaly: 2 };
-  critical.sort((a, b) => (ord[a.kind] - ord[b.kind]) || ((Math.abs(b.zA) + Math.abs(b.zD)) - (Math.abs(a.zA) + Math.abs(a.zD))));
+  const mag = x => Math.abs(x.zA) + Math.abs(x.zD);
+  const ord = { attack: 0, bleed: 1, anomaly: 0, "dlr-drop": 1 };
+  action.sort((a, b) => (ord[a.kind] - ord[b.kind]) || (mag(b) - mag(a)));
+  check.sort((a, b) => (ord[a.kind] - ord[b.kind]) || (mag(b) - mag(a)));
 
-  // --- Action Required group (full cards) ---
-  if (critical.length === 0) {
+  // --- groups: Action Required (cards) / Data Check (cards) / Watch (rows) ---
+  if (action.length === 0 && check.length === 0) {
     container.innerHTML += `
       <div class="alert-card green">
         <div class="alert-title" style="color:var(--good)">STABLE: No processes require action</div>
-        <div class="alert-desc">None are in the Spike, Bleed, or Anomaly quadrants. AFPR Z and Total Fraud $ Z are within ±1.5σ of their 30-day baselines.</div>
+        <div class="alert-desc">No Spike or Bleed triggers and nothing pending a data check — no trigger thresholds crossed vs the 30-day baselines.</div>
       </div>`;
-  } else {
-    container.innerHTML += `<div class="alert-group-head">Action Recommended · ${critical.length}</div>`;
   }
-
-  critical.forEach(a => {
+  if (action.length) container.innerHTML += `<div class="alert-group-head">Action Required · ${action.length}</div>`;
+  const renderCard = a => {
     const p = a.p;
     const card = document.createElement("div");
     card.className = "alert-card " + (a.kind === "anomaly" ? "anomaly-card" : a.kind);
@@ -2531,16 +2654,18 @@ function renderAlerts() {
         ? `Quality Bleed signal — ${p.short}`
         : a.kind === "anomaly"
           ? `Signal Anomaly — ${p.short}`
-          : a.kind === "early-attack"
-            ? `Early Spike Watch — ${p.short}`
-            : `Early-Bleed Watch — ${p.short}`;
+          : a.kind === "dlr-drop"
+            ? `Dollar Drop — ${p.short}`
+            : a.kind === "early-attack"
+              ? `Early Spike Watch — ${p.short}`
+              : `Early-Bleed Watch — ${p.short}`;
             
-    const titleColor = a.kind === "attack" 
-      ? "var(--bad)" 
-      : a.kind === "bleed" 
-        ? "var(--warn)" 
-        : a.kind === "anomaly" 
-          ? "var(--ink-dim)" 
+    const titleColor = a.kind === "attack"
+      ? "var(--bad)"
+      : a.kind === "bleed"
+        ? "var(--warn)"
+        : (a.kind === "anomaly" || a.kind === "dlr-drop")
+          ? "var(--ink-dim)"
           : a.kind === "early-attack"
             ? "var(--accent)"
             : "var(--early-bleed)";
@@ -2555,6 +2680,8 @@ function renderAlerts() {
       desc = `AFPR Z <b>${zAStr}σ</b> (total declines outstripping fraud catches) · Total Fraud $ Z <b>${zDStr}σ</b> — today ${fmt$(p.dToday)} vs μ ${fmt$(p.dMu)}.`;
     } else if (a.kind === "anomaly") {
       desc = `AFPR Z <b>${zAStr}σ</b> and Total Fraud $ Z <b>${zDStr}σ</b> move in directions that should not co-occur. Verify upstream data feed before reading either signal.`;
+    } else if (a.kind === "dlr-drop") {
+      desc = `Total Fraud $ Z <b>${zDStr}σ</b> dropped hard while AFPR stayed flat (<b>${zAStr}σ</b>) — the classic shape of a missing or partial feed. Verify upstream data before reading any trend as improvement.`;
     } else if (a.kind === "early-attack") {
       desc = `AFPR Z is dropping (<b>${zAStr}σ</b>), indicating a rising fraud share. Total Fraud $ is still flat (<b>${zDStr}σ</b>). Watch closely for emerging carding attacks.`;
     } else {
@@ -2562,7 +2689,9 @@ function renderAlerts() {
     }
 
     let streakBadge = "";
-    if (a.kind === "attack" || a.kind === "bleed" || a.kind === "anomaly") {
+    if (a.kind === "dlr-drop") {
+      streakBadge = "";
+    } else if (a.kind === "attack" || a.kind === "bleed" || a.kind === "anomaly") {
       streakBadge = a.streak >= 2
         ? `<span style="display:inline-block;margin-left:8px;padding:1px 7px;background:rgba(207,34,46,.12);color:var(--bad);font-size:9.5px;font-family:var(--mono);font-weight:700;border-radius:3px">sustained · ${a.streak}d</span>`
         : a.streak === 1
@@ -2577,11 +2706,13 @@ function renderAlerts() {
       ? "→ Inspect top merchant in this process"
       : a.kind === "bleed"
         ? "→ Inspect decline composition for this process"
-        : a.kind === "early-attack"
-          ? "→ Inspect merchant volume in this process"
-          : a.kind === "early-bleed"
-            ? "→ Inspect decline composition"
-            : "→ View process detail";
+        : a.kind === "dlr-drop"
+          ? "→ Verify batch volume / data feed"
+          : a.kind === "early-attack"
+            ? "→ Inspect merchant volume in this process"
+            : a.kind === "early-bleed"
+              ? "→ Inspect decline composition"
+              : "→ View process detail";
     const btn = `<button class="action-btn" onclick="ccBubbleClick('${p.id}')">${btnLabel}</button>`;
 
     card.innerHTML = `
@@ -2590,27 +2721,41 @@ function renderAlerts() {
       ${btn}
     `;
     container.appendChild(card);
-  });
+  };
+  action.forEach(renderCard);
 
-  // --- Early Watch group (compact one-line rows, de-emphasized) ---
+  if (check.length) {
+    const head = document.createElement("div");
+    head.className = "alert-group-head";
+    head.style.marginTop = action.length ? "14px" : "4px";
+    head.textContent = `Data Check · ${check.length}`;
+    container.appendChild(head);
+    check.forEach(renderCard);
+  }
+
+  // --- Watch group (compact one-line rows, de-emphasized) ---
   if (watch.length > 0) {
     const head = document.createElement("div");
     head.className = "alert-group-head";
-    head.style.marginTop = critical.length ? "14px" : "4px";
-    head.textContent = `Early Watch · ${watch.length}`;
+    head.style.marginTop = (action.length + check.length) ? "14px" : "4px";
+    head.textContent = `Watch · ${watch.length}`;
     container.appendChild(head);
 
     watch.forEach(a => {
       const p = a.p;
-      const dotColor = a.kind === "early-attack" ? "var(--accent)" : "var(--early-bleed)";
-      const label = a.kind === "early-attack" ? "AFPR-Z falling" : "AFPR-Z rising";
+      const isDlr = a.kind === "dlr-spike";
+      const dotColor = isDlr ? "var(--bad)" : a.kind === "early-attack" ? "var(--accent)" : "var(--early-bleed)";
       const zAStr = (a.zA >= 0 ? "+" : "") + a.zA.toFixed(1);
+      const zDStr = (a.zD >= 0 ? "+" : "") + a.zD.toFixed(1);
+      const meta = isDlr
+        ? `$ spike <b style="color:${dotColor}">${zDStr}σ</b> · AFPR flat`
+        : `${a.kind === "early-attack" ? "AFPR-Z falling" : "AFPR-Z rising"} <b style="color:${dotColor}">${zAStr}σ</b> · $ flat`;
       const row = document.createElement("div");
       row.className = "watch-row";
       row.innerHTML = `
         <span class="watch-dot" style="background:${dotColor}"></span>
         <span class="watch-name">${p.short}</span>
-        <span class="watch-meta">${label} <b style="color:${dotColor}">${zAStr}σ</b> · $ flat</span>`;
+        <span class="watch-meta">${meta}</span>`;
       row.onclick = () => ccBubbleClick(p.id);
       kbd(row, p.short + " — inspect process");
       container.appendChild(row);
@@ -2636,13 +2781,17 @@ window.showTooltip = function(e, pid) {
     "anomaly": "Quadrant I - ANOMALY (CHECK DATA)",
     "early-attack": "Quadrant III - EARLY-SPIKE WATCH",
     "early-bleed": "Q I/IV Watch - high AFPR-Z, $ still flat",
-    "stable": "Stable - inside ±1σ control band"
+    "dlr-spike": "$ SPIKE — AFPR flat (watch)",
+    "dlr-drop": "$ DROP — verify data feed",
+    "stable": "Stable — no trigger threshold crossed"
   }[c.kind];
 
   let color = "#58a6ff";
   if (c.kind === "attack") color = "var(--bad)";
   else if (c.kind === "bleed") color = "var(--warn)";
   else if (c.kind === "anomaly") color = "var(--ink-dim)";
+  else if (c.kind === "dlr-spike") color = "var(--accent)";
+  else if (c.kind === "dlr-drop") color = "var(--ink-dim)";
   else if (c.kind === "early-attack") color = "var(--accent)";
   else if (c.kind === "early-bleed") color = "var(--early-bleed)";
 
@@ -2684,7 +2833,7 @@ function renderTotalFraudLegend(){
   // View toggle: per-process total lines, or Approved-vs-Declined split of the selected processes.
   const modeT=document.createElement("div"); modeT.className="seg-toggle"; modeT.style.marginRight="10px";
   const _hsOk=famHas("hsAvail");
-  modeT.innerHTML=`<button data-tfm="process" class="${tfMode=='process'?'active':''}" aria-pressed="${tfMode=='process'}">By process</button><button data-tfm="split" class="${tfMode=='split'?'active':''}" aria-pressed="${tfMode=='split'}">Approved vs Declined</button><button data-tfm="hssplit" class="${tfMode=='hssplit'?'active':''}" aria-pressed="${tfMode=='hssplit'}"${_hsOk?"":` disabled style="opacity:.4;cursor:not-allowed" title="High-Spender breakdown not provided by the pipeline for this family"`}>HS vs Non-HS</button>`;
+  modeT.innerHTML=`<button data-tfm="process" class="${tfMode=='process'?'active':''}" aria-pressed="${tfMode=='process'}">By process</button><button data-tfm="split" class="${tfMode=='split'?'active':''}" aria-pressed="${tfMode=='split'}">Approved vs Declined</button><button data-tfm="hssplit" class="${tfMode=='hssplit'?'active':''}" aria-pressed="${tfMode=='hssplit'}"${_hsOk?"":` disabled style="opacity:.4;cursor:not-allowed" title="High-Spender breakdown not provided by the pipeline for this process category"`}>HS vs Non-HS</button>`;
   modeT.querySelectorAll("button").forEach(b=>b.onclick=()=>{ if(b.disabled) return; tfMode=b.dataset.tfm; renderTotalFraudLegend(); drawTotalFraud(); });
   wrap.appendChild(modeT);
   const allOn = tfVisible.size===PROCESSES.length;
@@ -2812,7 +2961,7 @@ function drawTotalFraud(){
   if(tfVisible.size===0) svg+=`<text x="${pl+iw/2}" y="${pt+ih/2}" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--sans)" font-size="13" font-weight="600">No processes selected — click a chip above</text>`;
   const el=$("#totalFraudSvg"); if(!el) return; el.innerHTML=svg;
   setupSvgHover("totalFraudSvg",{W,pl,iw,pt,ih,n:NDAYS, dateAt:i=>procDates()[i],
-    rowsAt:i=>PROCESSES.filter(p=>series[p.id]).map(p=>({label:p.short,color:p.color,value:fmt$(series[p.id][i]),y:y(series[p.id][i])})) });
+    rowsAt:i=>PROCESSES.filter(p=>series[p.id]).map(p=>({label:p.short,color:p.color,value:fmt$(series[p.id][i]),y:y(series[p.id][i])})).sort((a,b)=>a.y-b.y) });
   renderTotalFraudSparks();
 }
 function renderTotalFraudSparks(){
@@ -2846,9 +2995,21 @@ function setupSvgHover(svgId, cfg) {
   if (!svg) return;
   svg.style.cursor = "crosshair";
   const clearGuide = () => { const g = svg.querySelector('[data-guide="1"]'); if (g) g.remove(); };
+  const lineTip = () => document.getElementById("lineTooltip");
+  // Vertical distance (in viewBox units) within which the cursor counts as "on" a line.
+  const HIT_TOL = 12;
+  // client px -> viewBox units. getScreenCTM handles any letterboxing, so y is trustworthy
+  // even when the rendered box aspect differs from the viewBox aspect.
+  const toViewBox = (e) => {
+    const m = svg.getScreenCTM(); if (!m) return null;
+    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    return pt.matrixTransform(m.inverse());
+  };
   svg.onmousemove = (e) => {
     const r = svg.getBoundingClientRect();
-    const mx = (e.clientX - r.left) * (cfg.W / r.width);   // client px -> viewBox units
+    const vb = toViewBox(e);
+    const mx = vb ? vb.x : (e.clientX - r.left) * (cfg.W / r.width);
+    const my = vb ? vb.y : null;
     let i = Math.round((mx - cfg.pl) / cfg.iw * (cfg.n - 1));
     i = Math.max(0, Math.min(cfg.n - 1, i));
     const px = cfg.pl + cfg.iw * i / (cfg.n - 1);
@@ -2857,17 +3018,43 @@ function setupSvgHover(svgId, cfg) {
     const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
     g.setAttribute("data-guide", "1");
     g.style.pointerEvents = "none";
+    // Which line is the cursor actually on? Nearest row by vertical distance, if close enough.
+    let hit = null, best = Infinity;
+    if (my != null) rows.forEach(rw => {
+      if (rw.divider || rw.y == null) return;
+      const d = Math.abs(rw.y - my);
+      if (d < best) { best = d; hit = rw; }
+    });
+    if (best > HIT_TOL) hit = null;
     let inner = `<line x1="${px.toFixed(1)}" y1="${cfg.pt}" x2="${px.toFixed(1)}" y2="${cfg.pt + cfg.ih}" stroke="var(--ink-dim)" stroke-width="1" stroke-dasharray="2 3" opacity="0.7"/>`;
-    rows.forEach(rw => { if (rw.y != null) inner += `<circle cx="${px.toFixed(1)}" cy="${rw.y.toFixed(1)}" r="3.2" fill="${rw.color}" stroke="var(--panel)" stroke-width="1.2"/>`; });
+    rows.forEach(rw => { if (rw.y == null) return;
+      const on = hit && rw === hit;
+      inner += `<circle cx="${px.toFixed(1)}" cy="${rw.y.toFixed(1)}" r="${on?5:3.2}" fill="${rw.color}" stroke="var(--panel)" stroke-width="${on?2:1.2}"/>`;
+      if (on) inner += `<circle cx="${px.toFixed(1)}" cy="${rw.y.toFixed(1)}" r="8.5" fill="none" stroke="${rw.color}" stroke-width="1.2" opacity="0.45"/>`;
+    });
     g.innerHTML = inner;
     svg.appendChild(g);
+    // Second tooltip: names the hovered line, anchored to its dot so it reads as belonging to it.
+    const lt = lineTip();
+    if (lt) {
+      if (hit) {
+        lt.innerHTML = `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${hit.color};margin-right:6px"></span>${hit.label}`;
+        lt.style.borderColor = hit.color;
+        const m = svg.getScreenCTM();
+        const sp = svg.createSVGPoint(); sp.x = px; sp.y = hit.y;
+        const scr = m ? sp.matrixTransform(m) : null;
+        if (scr) { lt.style.left = (scr.x + window.scrollX) + "px";
+                   lt.style.top  = (scr.y + window.scrollY - 12) + "px"; }
+        lt.style.opacity = "1";
+      } else lt.style.opacity = "0";
+    }
     const tt = document.getElementById("quadrantTooltip");
     tt.innerHTML = `<div style="font-weight:800;font-size:11.5px;margin-bottom:5px">${cfg.dateAt(i)}</div>` +
       rows.map(rw => rw.divider ? `<div style="border-top:1px solid rgba(128,128,128,.28);margin:5px 0 3px"></div>` : `<div style="display:flex;align-items:center;gap:7px;margin-bottom:2.5px"><span style="width:8px;height:8px;border-radius:50%;background:${rw.color};display:inline-block;flex:none"></span>${rw.label}: <b style="margin-left:auto;padding-left:10px">${rw.value}</b></div>`).join("");
     tt.style.opacity = "1";
     moveTooltip(e);
   };
-  svg.onmouseleave = () => { clearGuide(); hideTooltip(); };
+  svg.onmouseleave = () => { clearGuide(); hideTooltip(); const lt = lineTip(); if (lt) lt.style.opacity = "0"; };
 }
 
 // Closed loop focus from bubble click — routes through dispatcher so palette / target stays consistent with alert card button.
@@ -3243,18 +3430,20 @@ function renderExecutiveSummary() {
     F.procs.forEach(p => SYS.push({ p, ds: F.dollarStats[p.id], tr: F.trend[p.id] || { T1: [], T2: [], T3: [] } }));
   });
 
+  let dataCheck = 0;
   SYS.forEach(({ p, ds }) => {
     const zA = (p.afpr - p.mu) / (p.sd || 1);
     const kind = classifyZ(zA, ds ? ds.z : 0);
     if (kind === "attack") { critical++; attackCount++; }
     else if (kind === "bleed") { critical++; bleedCount++; }
-    else if (kind === "anomaly") { critical++; anomalyCount++; }
-    else if (kind === "early-attack" || kind === "early-bleed") { watch++; }
+    else if (kind === "anomaly" || kind === "dlr-drop") { dataCheck++; anomalyCount++; }
+    else if (kind === "early-attack" || kind === "early-bleed" || kind === "dlr-spike") { watch++; }
     else { stable++; }
   });
 
   const totalProcesses = SYS.length;
-  const stableRatio = totalProcesses > 0 ? Math.round(((totalProcesses - critical) / totalProcesses) * 100) : 100;
+  // % Stable = strictly-stable only — Early Watch is NOT stable (it was silently counted before).
+  const stableRatio = totalProcesses > 0 ? Math.round((stable / totalProcesses) * 100) : 100;
 
   let totalFraudToday = 0;
   let totalFraudMean = 0;
@@ -3265,21 +3454,25 @@ function renderExecutiveSummary() {
   const fraudDiffStr = fraudDiffPct >= 0 ? `+${fraudDiffPct.toFixed(1)}%` : `${fraudDiffPct.toFixed(1)}%`;
   const fraudColorClass = totalFraudToday > totalFraudMean ? "var(--bad)" : "var(--good)";
 
-  let sumAfpr = 0;
-  SYS.forEach(({ p }) => sumAfpr += p.afpr);
-  const avgAfpr = totalProcesses > 0 ? (sumAfpr / totalProcesses).toFixed(1) : "0.0";
+  // Account-weighted system AFPR = Σ accounts ÷ Σ fraud accounts. A simple mean of per-process
+  // AFPRs gave a 2k-account process the same weight as a 300k one, distorting the system view.
+  let sumTot = 0, sumFrd = 0;
+  SYS.forEach(({ p }) => { sumTot += (p.tot || 0); sumFrd += (p.frd || 0); });
+  const avgAfpr = sumFrd > 0 ? (sumTot / sumFrd).toFixed(1) : "0.0";
 
-  // Classify a process for a historical dayIdx using ITS family's trend (tr).
-  function classifyHist(p, dayIdx, tr) {
+  // Classify a process for a historical day using ITS family's trend (tr).
+  // afprIdx indexes the 75-day afprHist; dlrIdx indexes the 45-day trend — the two arrays have
+  // different lengths, so sharing one index silently read AFPR from ~30 days earlier.
+  function classifyHist(p, afprIdx, dlrIdx, tr) {
     const afprHist = p.afprHist;
-    const histA = afprHist.slice(dayIdx - 30, dayIdx);
+    const histA = afprHist.slice(afprIdx - 30, afprIdx);
     const muA = mean(histA), sdA = std(histA) || 1;
-    const zA = (afprHist[dayIdx] - muA) / sdA;
+    const zA = (afprHist[afprIdx] - muA) / sdA;
 
     const series = Array(NDAYS).fill(0);
     TIERS.forEach(t => (tr[t] || []).forEach((v, i) => series[i] += v));
-    const todayD = series[dayIdx];
-    const histD = series.slice(dayIdx - 30, dayIdx);
+    const todayD = series[dlrIdx];
+    const histD = series.slice(dlrIdx - 30, dlrIdx);
     const muD = mean(histD), sdD = std(histD) || 1;
     const zD = (todayD - muD) / sdD;
 
@@ -3287,6 +3480,8 @@ function renderExecutiveSummary() {
     if (zA >  Z_AFPR_STRONG && zD < -Z_DLR_BLEED)   return { kind: "bleed" };
     if (zA < -Z_AFPR_STRONG && zD < -Z_DLR_BLEED)   return { kind: "anomaly" };
     if (zA >  Z_AFPR_STRONG && zD >  Z_DLR_STRONG)  return { kind: "anomaly" };
+    if (zD >=  Z_DLR_STRONG)                        return { kind: "dlr-spike" };
+    if (zD <= -2.0)                                 return { kind: "dlr-drop" };
     if (zA < -1.0 && Math.abs(zD) <= Z_DLR_STRONG)  return { kind: "early-attack" };
     if (zA >  1.0 && Math.abs(zD) <= Z_DLR_BLEED )  return { kind: "early-bleed" };
     return { kind: "stable" };
@@ -3299,18 +3494,22 @@ function renderExecutiveSummary() {
   const afprHist = [];
 
   for (let d = NDAYS - 7; d < NDAYS; d++) {
-    let stabCount = 0, critCount = 0, sumD = 0, sumA = 0;
+    const j = d - (NDAYS - 7);                       // 0..6 into the 7-day acct series
+    let stabCount = 0, critCount = 0, sumD = 0, wTot = 0, wFrd = 0;
     SYS.forEach(({ p, tr }) => {
-      const k = classifyHist(p, d, tr).kind;
-      if (k === "attack" || k === "bleed" || k === "anomaly") critCount++;
-      else stabCount++;
+      // align indices: trend arrays are 45d (index d); afprHist is 75d (same末端, offset by length diff)
+      const aIdx = p.afprHist.length - NDAYS + d;
+      const k = classifyHist(p, aIdx, d, tr).kind;
+      if (k === "attack" || k === "bleed") critCount++;          // ACTION only — data check is not "action"
+      else if (k === "stable") stabCount++;          // watch/data-check are neither stable nor critical
       TIERS.forEach(t => sumD += (tr[t] && tr[t][d] != null ? tr[t][d] : 0));
-      sumA += p.afprHist[d];
+      wTot += (p.acct7 && p.acct7.tot[j]) || 0;      // account-weighted AFPR, same basis as the card
+      wFrd += (p.acct7 && p.acct7.frd[j]) || 0;
     });
     stableHist.push(stabCount);
     alertHist.push(critCount);
     fraudHist.push(sumD);
-    afprHist.push(totalProcesses > 0 ? sumA / totalProcesses : 0);
+    afprHist.push(wFrd > 0 ? wTot / wFrd : 0);
   }
 
   
@@ -3337,16 +3536,16 @@ function renderExecutiveSummary() {
   const alertColor = critical > 0 ? 'var(--bad)' : 'var(--good)';
 
   container.innerHTML = `
-    <div class="summary-card">
+    <div class="summary-card" data-goto="00.2" title="Jump to Process Deviation Matrix">
       <div class="summary-card-text">
         <div class="label">Operational Health</div>
         <div class="value" style="color:${healthColor}">${stableRatio}% Stable</div>
-        <div class="subtext">${totalProcesses - critical} of ${totalProcesses} processes within normal limits.</div>
+        <div class="subtext">${stable} stable · ${watch} watch · ${dataCheck} data check · ${critical} action</div>
       </div>
       ${genSparklineSvg(stableHist, healthColor)}
     </div>
-    
-    <div class="summary-card">
+
+    <div class="summary-card" data-goto="01.3" title="Jump to Fraud $ trend">
       <div class="summary-card-text">
         <div class="label">Total Fraud $</div>
         <div class="value">$${totalFraudToday.toLocaleString(undefined, {maximumFractionDigits:0})}</div>
@@ -3354,25 +3553,36 @@ function renderExecutiveSummary() {
       </div>
       ${genSparklineSvg(fraudHist, fraudColorClass)}
     </div>
-    
-    <div class="summary-card">
+
+    <div class="summary-card" data-goto="00.2" title="Jump to the action list in the Deviation Matrix">
       <div class="summary-card-text">
         <div class="label">System Risk Alerts</div>
         <div class="value" style="color:${alertColor}">${critical} Action Recommended</div>
-        <div class="subtext">${critical > 0 ? `${attackCount} attack, ${bleedCount} bleed, ${anomalyCount} anomaly` : 'No active operational anomalies.'}</div>
+        <div class="subtext">${critical > 0 || dataCheck > 0 ? `${attackCount} spike · ${bleedCount} bleed · ${dataCheck} data check` : 'No active operational anomalies.'}</div>
       </div>
       ${genSparklineSvg(alertHist, alertColor)}
     </div>
-    
-    <div class="summary-card">
+
+    <div class="summary-card" data-goto="01.2" title="Jump to Process AFPR trend">
       <div class="summary-card-text">
         <div class="label">System Average AFPR</div>
         <div class="value" style="color:var(--accent)">${avgAfpr}</div>
-        <div class="subtext">Average False Positive Ratio across processes.</div>
+        <div class="subtext">Account-weighted: Σ accounts ÷ Σ fraud accounts.</div>
       </div>
       ${genSparklineSvg(afprHist, 'var(--accent)')}
     </div>
   `;
+  // Cards navigate to their backing section (scroll by section number, robust to reordering).
+  container.querySelectorAll(".summary-card[data-goto]").forEach(card => {
+    card.style.cursor = "pointer";
+    card.insertAdjacentHTML("beforeend", '<span class="go" aria-hidden="true">\u203a</span>');
+    card.onclick = () => {
+      const num = card.dataset.goto;
+      const sec = [...document.querySelectorAll("section .sec-num")].find(e => e.textContent.trim() === num);
+      if (sec) sec.closest("section").scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    kbd(card, card.title);
+  });
 }
 
 /* ---------- MODULE 05: SOURCE PERFORMANCE 15D ---------- */
@@ -3442,6 +3652,7 @@ const SRC_FAM_LABEL = { testing: "Testing", cpp: "CPP", vendor: "Vendor", atm: "
 const SRC_FAM_COLOR = { testing: "var(--pc-blue)", cpp: "var(--pc-teal)", vendor: "var(--pc-purple)", atm: "var(--pc-amber)" };
 let srcFam = "all";
 let srcSort = { k: "fdlr", dir: -1 };
+let srcPerfExpanded = false;   // §02.2 collapsed to top-10 rows by default
 
 function renderSrcPerf() {
   const body = $("#srcPerfBody");
@@ -3457,7 +3668,8 @@ function renderSrcPerf() {
     th.classList.toggle("sort-desc", th.dataset.k === k && dir === -1);
   });
   body.innerHTML = "";
-  rows.forEach(r => {
+  const SP_LIMIT = 10;
+  rows.forEach((r, _i) => {
     // Flag tier AFPRs far above the source's own blended AFPR (suspicious tier leakage).
     const tierCell = (d, a) => `<td style="color:var(--ink-dim)">${fmt$(d)}</td><td style="font-weight:700;color:${a >= r.afpr * 3 ? "var(--bad)" : a >= r.afpr * 1.8 ? "var(--warn)" : "var(--ink)"}">${a.toFixed(1)}</td>`;
     const tr = document.createElement("tr");
@@ -3469,14 +3681,21 @@ function renderSrcPerf() {
       <td style="font-weight:700">${fmt$(r.fdlr)}</td>
       <td style="font-weight:700">${r.afpr.toFixed(1)}</td>
       ${tierCell(r.t1d, r.t1a)}${tierCell(r.t2d, r.t2a)}${tierCell(r.t3d, r.t3a)}`;
+    if (_i >= SP_LIMIT && !srcPerfExpanded) tr.style.display = "none";
     body.appendChild(tr);
   });
+  if (rows.length > SP_LIMIT) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="12" style="text-align:left;border-bottom:0"><button class="dd-more">${srcPerfExpanded ? "show less" : `+${rows.length - SP_LIMIT} more sources`}</button></td>`;
+    tr.querySelector("button").onclick = () => { srcPerfExpanded = !srcPerfExpanded; renderSrcPerf(); };
+    body.appendChild(tr);
+  }
 }
 
 function initSrcPerf() {
   renderSrcPerf();
   document.querySelectorAll("#srcPerfTabs .tab-btn").forEach(b => b.onclick = () => {
-    srcFam = b.dataset.fam;
+    srcFam = b.dataset.fam; srcPerfExpanded = false;
     document.querySelectorAll("#srcPerfTabs .tab-btn").forEach(x => x.classList.toggle("active", x === b));
     renderSrcPerf();
   });
@@ -3489,20 +3708,113 @@ function initSrcPerf() {
   });
 }
 
+/* ---------- PAGE 2: METHODOLOGY — per-module design rationale, chip-filtered ---------- */
+const METHODS = [
+  { id: "00.1", title: "Executive Summary", body: `
+    One-glance system state across <b>all four process categories</b> (Testing · CPP · Vendor · ATM). Design choices:
+    <b>% Stable counts strictly-stable processes only</b> — Early Watch is disclosed separately, not hidden inside "stable".
+    <b>System AFPR is account-weighted</b> (Σ accounts ÷ Σ fraud accounts), so a 300k-account process outweighs a 2k one — a simple mean would distort the system view.
+    Total Fraud $ compares today against each process's <b>own 30-day mean</b>. Every card deep-links to its backing module.` },
+  { id: "00.2", title: "Process Deviation Matrix", body: `
+    Fraud shows up in two different signals: <b>$ moving</b> (vertical) and <b>blocking behavior moving</b> (horizontal, AFPR).
+    Reading them jointly separates a <b>fraud spike</b> from <b>batch-quality drift</b> and from <b>data anomalies</b> that fake both.
+    Each process is normalized against its <b>own 30-day baseline</b> (z-scores), so processes of very different sizes share one chart.
+    The green box is a <b>±2σ reference frame</b> — the actual triggers fire at ±1.5σ (bleed $ at −1σ, dollar-drop at −2σ),
+    in the SPC screening tradition rather than as a normality claim: fraud series are skewed and autocorrelated,
+    so a breach is a triage flag an analyst confirms, and <b>sustained</b> (2d+) breaches carry a badge.
+    Findings split into three groups: <b>Action Required</b> (spike / bleed), <b>Data Check</b> (contradictory signals or a
+    dollar-only drop — verify the feed before acting) and <b>Watch</b> (one-axis early signals and dollar-only spikes).
+    Bubble area ∝ decline volume.` },
+  { id: "01.1", title: "Process Quality Cards", body: `
+    Cards carry an <b>explicit status, not a score</b>. The former 0–100 health score was retired by design review:
+    it re-encoded §00.2's classification through uncalibrated deductions (−50/−35/−25/−15, −5 per day) and cut-offs
+    (70/90) that manufactured precision without adding information — and it could contradict the matrix.
+    Status now IS the matrix classification (<b>ACTION</b> = spike / bleed · <b>DATA CHECK</b> = anomaly ·
+    <b>WATCH</b> = early signal · <b>STABLE</b>), so the two modules can never disagree.
+    Each card shows the four decision inputs directly: <b>AFPR z</b>, <b>Total Fraud $ z</b>, <b>persistence</b>
+    (consecutive days beyond 1σ) and <b>business impact</b> ($ · accounts). Context badges — SUSTAINED nD / DAY 1,
+    HIGH IMPACT (strict top quartile by count of process-category fraud $), LOW SAMPLE (&lt;5 fraud accounts), and the specific
+    missing-feed flags HS N/A / V15 N/A / ACCT N/A (each disables only its own filter; the core status is unaffected) —
+    add information, not judgement. Dollar-only deviations get their own statuses (WATCH · DOLLAR SPIKE, DATA CHECK · DOLLAR DROP)
+    so a $ move with quiet AFPR can no longer hide inside "stable". The track still shows today's AFPR inside its 30-day ±2σ control band;
+    <b>AFPR = total accounts ÷ fraud accounts</b>. Click a card for the tier breakdown.` },
+  { id: "01.2", title: "Process AFPR — Multi-line", body: `
+    15-day trailing view of the quality KPI. The <b>z-score view normalizes different baselines</b> so all processes are comparable on one axis;
+    the absolute view keeps raw AFPR. It <b>shares one process selection with §01.3</b>, so the two core KPIs always describe the same processes —
+    "$ up while AFPR flat" vs "$ up and AFPR moving" is the core diagnostic read.` },
+  { id: "01.3", title: "Fraud $ — Total / Approved / Declined", body: `
+    Identity: <b>Total = Approved + Declined</b>. SQL contract: the 'All' row carries total fraud $, tier rows carry approved $, declined is derived —
+    one query feeds all three lenses. Every displayed day is a <b>trailing window</b> (Testing 10d · CPP/Vendor/ATM 15d) rebuilt <b>as-of that day</b>,
+    with fraud-report maturity replayed — history doesn't drift and there is no look-ahead.
+    Filters: <b>High-Spender</b> segment; the <b>15-min-verified carve-out</b> removes must-approve $ so T2/T3 show only rule-declinable fraud.
+    The dashed <b>account line</b> separates single-account $ spikes from systemic moves.` },
+  { id: "02.1", title: "Fraud Merchant Detail", body: `
+    Two grains on purpose: <b>'All' = per-merchant dedup</b> (each transaction counted once — the ranking view), and
+    <b>per-process attribution</b> (a transaction hit by N processes appears under each — so $ is <b>not additive</b> across processes).
+    Merchants are keyed by <b>MID + MCC</b> so name variants merge. Snapshot windows match §01.3.
+    The Total / Approved / Declined lens re-ranks by the chosen side; <b>Decl % = declined $ ÷ total fraud $</b>.
+    For the re-ranking to be honest, extraction must not filter through Total alone: the source SQL keeps every
+    merchant in <b>any</b> of the three top-10s (by total, by approved, by declined — union per source). Otherwise an
+    approved-heavy merchant that misses the Total cut would be absent from the Approved leaderboard entirely.
+    Ratio metrics grey out below 20 transactions (low base).` },
+  { id: "02.2", title: "Follow-up Fraud Detail", body: `
+    Mirrors the SAS follow-up emails: <b>Tn Aprv $</b> = approved fraud $ attributed to tier n in the window,
+    <b>Tn AFPR</b> = tier-level account false-positive ratio — tiers whose AFPR far exceeds the source's blended AFPR are flagged.
+    Sortable on every column; collapsed to the top 10 sources by default.` },
+  { id: "03.1", title: "Process Volume Monitor", body: `
+    A <b>data-health check, not a KPI</b>: batch throughput vs a 30-day baseline (volume z-score) plus a 45-day trajectory with an OLS trend line.
+    A volume collapse usually means an upstream feed issue — catching it here stops false "fraud dropped" reads upstream.
+    It sits in the appendix so the KPI narrative stays clean. Groups: Testing/ATM (one batch stream) · CPP/Vendor · Merchant LUL.` },
+  { id: "data", title: "Data Integrity Rules", body: `
+    <b>Nothing is fabricated.</b> If the pipeline omits a field (e.g. HS or 15-min-verified splits), the dependent control is disabled with a
+    "not provided" note — never filled with constants. Ratios on tiny bases are greyed, not hidden.
+    Demo mode runs on synthetic, anonymized data; generated reports carry real production data — <b>internal distribution only</b>.
+    The report is a single self-contained HTML: no CDN, no network calls, opens from file:// or an email attachment.` },
+];
+let methodFilter = METHODS[0].id;   // one module at a time — the old "All modules" default dumped 9 long cards at once
+function renderMethodology(){
+  const toc=$("#methodChips"), body=$("#methodBody");
+  if(!toc||!body) return;
+  toc.innerHTML="";
+  METHODS.forEach(m=>{
+    const b=document.createElement("button");
+    b.className = methodFilter===m.id ? "cur" : "";
+    b.innerHTML=`<span class="mnum">${m.id==="data"?"—":m.id}</span><span>${m.title}</span>`;
+    b.onclick=()=>{ methodFilter=m.id; renderMethodology(); };
+    toc.appendChild(b);
+  });
+  const m = METHODS.find(x=>x.id===methodFilter) || METHODS[0];
+  body.innerHTML = `
+    <div class="panel" style="padding:22px 26px">
+      <div style="font-family:var(--mono);font-size:11px;font-weight:750;color:var(--accent);letter-spacing:.05em;margin-bottom:6px">${m.id==="data"?"GLOBAL":"§"+m.id}</div>
+      <h3 style="margin:0 0 10px;font-size:17px;letter-spacing:-0.02em">${m.title}</h3>
+      <div style="font-size:12.5px;line-height:1.85;color:var(--ink-dim)">${m.body}</div>
+    </div>`;
+}
+function setPage(p){
+  document.querySelectorAll(".page").forEach(pg=>pg.classList.toggle("active", pg.id==="page-"+p));
+  document.querySelectorAll(".topnav .nav-page").forEach(b=>b.classList.toggle("active", b.dataset.page===p));
+  const fn=document.getElementById("famNav"); if(fn) fn.style.display = (p==="overview") ? "" : "none";
+  if(p==="methodology") renderMethodology();
+  buildSideNav();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".topnav .nav-page").forEach(b=>b.onclick=()=>setPage(b.dataset.page));
+
 /* init */
 renderExecutiveSummary();
 renderAfprLegend(); drawAfpr();
 renderKPI(); renderLegend(); drawTrend();
 renderTotalFraudLegend(); drawTotalFraud();
 drawCommandCenter(); renderVerdict(); renderAlerts();
-document.querySelectorAll("#ccTabs .tab-btn").forEach(b => b.onclick = () => setProcFam(b.dataset.ccfam, b));
-document.querySelectorAll(".pf-tabs .tab-btn").forEach(b => b.onclick = () => setProcFam(b.dataset.pf, b));
+document.querySelectorAll("#globalFamTabs .tab-btn").forEach(b => b.onclick = () => setProcFam(b.dataset.gfam));
 document.querySelectorAll("[data-hs]").forEach(b => b.onclick = () => setHsSeg(b.dataset.hs));
 $("#ddModeToggle").querySelectorAll("button").forEach(b=>b.onclick=()=>setDDMode(b.dataset.mode));
 $("#ddDlrToggle").querySelectorAll("button").forEach(b=>b.onclick=()=>{
   if(b.disabled) return;
   ddDlrView=b.dataset.ddv;
   document.querySelectorAll("#ddDlrToggle button").forEach(x=>{ const on=x===b; x.classList.toggle("active",on); x.setAttribute("aria-pressed",on); });
+  $("#ddSub").textContent = ddSubText();
   renderDDTotal();
   if(ddMode==="process") renderDDProcess();
 });
@@ -3599,19 +3911,33 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeVolMo
   const g = document.getElementById('mhGen');  if (g) g.textContent = m.generated || `${ymd} ${z(now.getHours())}:${z(now.getMinutes())}`;
 })();
 (function renderGlobalStatus(){
-  const attacks = PROCESSES.filter(p => classify(p).kind === "attack").length;
-  const bleeds  = PROCESSES.filter(p => classify(p).kind === "bleed").length;
-  const anomalies = PROCESSES.filter(p => classify(p).kind === "anomaly").length;
+  // SYSTEM-WIDE, not the active category. This sits in the masthead next to "Batch window" and
+  // "SPC band", i.e. report-level framing, and it must agree with §00.1 (also a system roll-up).
+  // Scoping it to one category made it disagree with §00.1 and freeze on Testing, since nothing
+  // re-ran it on a category switch. System-wide is correct by construction: there is nothing to
+  // re-render. NOTE: classify() reads the ACTIVE DOLLAR_STATS, so it cannot be used across
+  // categories — each proc must be scored against its OWN family's dollarStats.
+  let attacks = 0, bleeds = 0, anomalies = 0;
+  ["testing","cpp","vendor","atm"].forEach(fam => {
+    const F = FAMS[fam]; if (!F) return;
+    F.procs.forEach(p => {
+      const ds = F.dollarStats[p.id];
+      const kind = classifyZ((p.afpr - p.mu) / (p.sd || 1), ds ? ds.z : 0);
+      if (kind === "attack") attacks++;
+      else if (kind === "bleed") bleeds++;
+      else if (kind === "anomaly") anomalies++;
+    });
+  });
   const el = document.getElementById("globalStatus");
   if (!el) return;
   if (attacks + bleeds + anomalies === 0) {
-    el.innerHTML = '<b style="color:var(--good)">ALL CLEAR</b>';
+    el.innerHTML = '<span class="scope-tag">system-wide</span> <b style="color:var(--good)">ALL CLEAR</b>';
   } else {
     const parts = [];
     if (attacks)  parts.push(`<b style="color:var(--bad)">${attacks} ATTACK</b>`);
     if (bleeds)   parts.push(`<b style="color:var(--warn)">${bleeds} BLEED</b>`);
     if (anomalies) parts.push(`<b style="color:var(--ink-dim)">${anomalies} ANOMALY</b>`);
-    el.innerHTML = parts.join(' · ');
+    el.innerHTML = '<span class="scope-tag">system-wide</span> ' + parts.join(' · ');
   }
 })();
 
