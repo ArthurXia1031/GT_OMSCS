@@ -299,7 +299,7 @@
   .tier-drawer{grid-column:1/-1;background:var(--panel-2);border:1.5px solid var(--accent);border-radius:10px;overflow:hidden;max-height:0;transition:max-height .25s ease;margin-top:-14px}
   .tier-drawer.open{max-height:400px;margin-top:0}
   .tier-inner{padding:18px 20px}
-  .drawer-grid{display:grid;grid-template-columns:minmax(270px,1fr) 2.05fr;gap:26px;align-items:start}
+  .drawer-grid{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:26px;align-items:start}
   @media(max-width:900px){ .drawer-grid{grid-template-columns:1fr} .tier-drawer.open{max-height:640px} }
   .tier-inner h4{margin:0 0 12px;font-size:13px;font-weight:700;font-family:var(--mono);color:var(--accent);letter-spacing:-0.015em}
 
@@ -361,7 +361,7 @@
 
   /* ---- drilldown module ---- */
   .dd-mode{display:flex;gap:10px;margin-bottom:16px;align-items:center}
-  .dd-wrap{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+  .dd-wrap{display:grid;grid-template-columns:7fr 3fr;gap:28px}
   .bar-row{display:grid;grid-template-columns:160px 1fr 92px;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;padding:8px 10px;border-radius:6px;transition:background .12s}
   .bar-row:hover{background:var(--panel-2)}
   .bar-row.sel{background:var(--panel-2);outline:1.5px solid var(--accent)}
@@ -399,10 +399,10 @@
   .dd-detail h4{margin:0 0 6px;font-size:14px;font-weight:700;font-family:var(--mono);letter-spacing:-0.015em}
   .dd-detail .mname{color:var(--accent)}
   .dd-hint{color:var(--ink-faint);font-size:12px;font-family:var(--mono);padding:40px 0;text-align:center;font-weight:550}
-  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:20px 0}
-  .stat{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:16px 20px}
-  .stat .l{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em}
-  .stat .v{font-family:var(--mono);font-size:24px;font-weight:700;margin-top:4px;letter-spacing:-0.03em}
+  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:12px 0}
+  .stat{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:9px 13px}
+  .stat .l{font-family:var(--mono);font-size:9.5px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.07em}
+  .stat .v{font-family:var(--mono);font-size:17px;font-weight:700;margin-top:2px;letter-spacing:-0.02em}
   .proc-group{margin-bottom:18px}
   .proc-group h5{margin:0 0 8px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px}
   .proc-group h5 .ptot{margin-left:auto;color:var(--ink-dim);font-weight:600}
@@ -460,9 +460,9 @@
   .kbadge.b-persist{background:rgba(130,80,223,.10);color:var(--pc-purple);border:1px solid rgba(130,80,223,.30)}
   .kbadge.b-scale{background:var(--panel-2);color:var(--ink-dim);border:1px solid var(--line);font-weight:750}
   .kbadge.b-dim{background:var(--panel);color:var(--ink-faint);border:1px solid var(--line)}
-  .kpi-decision{display:grid;grid-template-columns:auto auto;justify-content:space-between;gap:3px 18px;margin-top:10px;border-top:1.5px dashed var(--line);padding-top:9px;font-family:var(--mono);font-size:11px}
+  .kpi-decision{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;column-gap:10px;row-gap:2px;margin-top:10px;border-top:1.5px dashed var(--line);padding-top:8px;font-family:var(--mono);font-size:10.5px;white-space:nowrap}
   .kpi-decision span{color:var(--ink-faint)}
-  .kpi-decision b{text-align:right;color:var(--ink);font-weight:700}
+  .kpi-decision b{color:var(--ink);font-weight:700}
   .kpi-card .expand-hint{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);opacity:.55;margin-top:7px;text-align:right}
   .kpi-card:hover .expand-hint{opacity:1;color:var(--accent)}
 
@@ -1606,9 +1606,10 @@ function renderKPI(){
       <div class="afpr-scale"><span>0</span><span>AFPR <b style="color:${st.c}">${p.afpr}</b> · μ${p.mu}</span><span>${maxA.toFixed(0)}</span></div>
       ${dTrack.html}
       <div class="kpi-decision">
-        <span>AFPR</span><b style="color:${zAcol}">${fz(c.zA)}σ</b>
-        <span>Fraud $</span><b style="color:${zDcol}">${fz(c.zD)}σ</b>
-        <span>${streak > 0 ? "Day " + streak : "No streak"}</span><b>${fmt$(ds.today || 0)} · ${fmtK(p.tot)} accts</b>
+        <span>AFPR <b style="color:${zAcol}">${fz(c.zA)}σ</b></span>
+        <span>$ <b style="color:${zDcol}">${fz(c.zD)}σ</b></span>
+        <span>${streak > 0 ? "Day " + streak : "no streak"}</span>
+        <span><b>${fmt$(ds.today || 0)} · ${fmtK(p.tot)}</b></span>
       </div>
       <div class="expand-hint">7d trend + tier breakdown \u203a</div>`;
     card.onclick=()=>toggleTier(idx,card);
@@ -1635,6 +1636,28 @@ function toggleTier(idx,card){
       </div>
       <table><thead><tr><th>Tier</th><th>AFPR</th><th>Tot Acct</th><th>Frd Acct</th><th>Fraud $</th></tr></thead><tbody>${rows}</tbody></table>
     </div></div>`;
+  // Hover crosshair on the 7d combo: same tooltip machinery as the big line charts, but the
+  // combo centers its 7 points mid-slot (bar layout), hence the xAt/idxAt overrides.
+  {
+    const svg=dr.querySelector(".mini-combo svg");
+    if(svg){
+      svg.id="drawerComboSvg";
+      const W=300,H=128,padL=32,padR=38,padT=10,padB=24, iw=W-padL-padR, ih=H-padT-padB;
+      const n=p.afpr7.length, gap=iw/n;
+      const aMax=Math.max(...p.afpr7)*1.18, aMin=Math.min(...p.afpr7)*0.82;
+      const ay=v=>padT+ih-((v-aMin)/((aMax-aMin)||1)*ih);
+      const d7dates=procDates().slice(-7);
+      setupSvgHover(svg,{W,pl:padL,iw,pt:padT,ih,n,
+        xAt:i=>padL+gap*i+gap/2,
+        idxAt:mx=>Math.round((mx-padL-gap/2)/gap),
+        dateAt:i=>d7dates[i]||"",
+        rowsAt:i=>[
+          {label:"AFPR",color:"var(--accent)",value:(p.afpr7[i]!=null?p.afpr7[i].toFixed(1):"—"),y:ay(p.afpr7[i]||0)},
+          {label:"Total acct",color:"var(--ink-faint)",value:fmtK(p.acct7.tot[i]||0),y:null},
+          {label:"Fraud acct",color:"var(--bad)",value:fmtK(p.acct7.frd[i]||0),y:null}
+        ]});
+    }
+  }
   // Insert the drawer AFTER the LAST card on the clicked card's row, so that row's cards
   // stay put (no gap, no reflow within the row); only rows below shift down for the drawer.
   const _cards=[...document.querySelectorAll(".kpi-card")];
@@ -1704,7 +1727,7 @@ function renderLegend(){
     const allBtn=document.createElement("button");
     allBtn.className="leg-btn"; allBtn.style.fontWeight="600"; allBtn.style.borderColor="var(--accent)";
     allBtn.style.color=allOn?"#fff":"var(--accent)"; allBtn.style.background=allOn?"var(--accent)":"var(--panel-2)";
-    allBtn.textContent=allOn?"All processes":"Select all";
+    allBtn.textContent=allOn?"Clear all":"Select all";
     allBtn.onclick=()=>{ if(visible.size===PROCESSES.length){visible.clear();} else {PROCESSES.forEach(p=>visible.add(p.id));} syncTrendCharts(); };
     wrap.appendChild(allBtn);
     appendChipsCollapsible(wrap, "trendLine", p=>{
@@ -1988,20 +2011,6 @@ function renderDDTotal(){
     ddSel = null;
     $("#ddDetail").innerHTML = '<div class="dd-hint">No merchant to show for this filter.</div>';
   } else {
-    // Approved/Declined lens: state the share up front. Vendor-type categories decline most
-    // fraud at auth, so the approved list is legitimately small-$ — without this line the
-    // reader assumes the ranking is broken rather than the block rate being high.
-    if(ddDlrView!=="all" && ddHasSplit()){
-      const sumTot=list.reduce((a,m)=>a+(m.fdlr||0),0);
-      const sumView=list.reduce((a,m)=>a+ddDlrOf(m),0);
-      const pctV=sumTot?Math.round(sumView/sumTot*100):0;
-      const note=document.createElement("div"); note.className="dd-hint";
-      note.style.marginBottom="8px";
-      note.innerHTML = ddDlrView==="apr"
-        ? `Approved <b>${fmt$(sumView)}</b> = <b>${pctV}%</b> of ${fmt$(sumTot)} total fraud $ across listed merchants — the other ${100-pctV}% was declined at auth.`
-        : `Declined <b>${fmt$(sumView)}</b> = <b>${pctV}%</b> of ${fmt$(sumTot)} total fraud $ across listed merchants.`;
-      wrap.appendChild(note);
-    }
     // Default the right pane to the top-$ merchant when nothing valid is selected,
     // so the detail never sits on the "click a merchant" hint.
     const topByDlr = list.slice().sort((a,b)=>ddDlrOf(b)-ddDlrOf(a))[0];
@@ -2107,7 +2116,7 @@ function renderDDProcess(){
   
   // Two-column grid of process sections, each the same compact table as "By Total $":
   // header = process + group $ + merchant count; top-5 rows, rest behind "+N more".
-  host.style.cssText="display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:8px 28px;align-items:start";
+  host.style.cssText="display:grid;grid-template-columns:repeat(auto-fill,minmax(520px,1fr));gap:16px 36px;align-items:start";
   if(ddDlrView==="all" && ddHasSplit()){
     const leg=document.createElement("div");
     leg.style.cssText="grid-column:1/-1;font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);display:flex;gap:14px;align-items:center;flex-wrap:wrap";
@@ -2188,7 +2197,7 @@ function renderAfprLegend(){
   const allBtn=document.createElement("button");
   allBtn.className="leg-btn"; allBtn.style.fontWeight="600"; allBtn.style.borderColor="var(--accent)";
   allBtn.style.color=allOn?"#fff":"var(--accent)"; allBtn.style.background=allOn?"var(--accent)":"var(--panel-2)";
-    allBtn.textContent=allOn?"All processes":"Select all";
+    allBtn.textContent=allOn?"Clear all":"Select all";
   allBtn.onclick=()=>{ if(afprVisible.size===PROCESSES.length){afprVisible.clear();} else {PROCESSES.forEach(p=>afprVisible.add(p.id));} syncTrendCharts(); };
   wrap.appendChild(allBtn);
   appendChipsCollapsible(wrap, "afpr", p=>{
@@ -2840,7 +2849,7 @@ function renderTotalFraudLegend(){
   const allBtn=document.createElement("button");
   allBtn.className="leg-btn"; allBtn.style.fontWeight="600"; allBtn.style.borderColor="var(--accent)";
   allBtn.style.color=allOn?"#fff":"var(--accent)"; allBtn.style.background=allOn?"var(--accent)":"var(--panel-2)";
-  allBtn.textContent=allOn?"All processes":"Select all";
+  allBtn.textContent=allOn?"Clear all":"Select all";
   allBtn.onclick=()=>{ if(allOn){tfVisible.clear();} else {PROCESSES.forEach(p=>tfVisible.add(p.id));} syncTrendCharts(); };
   wrap.appendChild(allBtn);
   appendChipsCollapsible(wrap, "total", p=>{
@@ -2991,7 +3000,9 @@ function renderTotalFraudSparks(){
   });
 }
 function setupSvgHover(svgId, cfg) {
-  const svg = document.getElementById(svgId);
+  // Accepts an id OR the element itself — the drawer attaches hover before insertion into the DOM,
+  // where getElementById cannot see the node yet.
+  const svg = typeof svgId === "string" ? document.getElementById(svgId) : svgId;
   if (!svg) return;
   svg.style.cursor = "crosshair";
   const clearGuide = () => { const g = svg.querySelector('[data-guide="1"]'); if (g) g.remove(); };
@@ -3010,9 +3021,10 @@ function setupSvgHover(svgId, cfg) {
     const vb = toViewBox(e);
     const mx = vb ? vb.x : (e.clientX - r.left) * (cfg.W / r.width);
     const my = vb ? vb.y : null;
-    let i = Math.round((mx - cfg.pl) / cfg.iw * (cfg.n - 1));
+    // Bar charts center points mid-slot (xAt/idxAt); line charts span edge-to-edge (default).
+    let i = cfg.idxAt ? cfg.idxAt(mx) : Math.round((mx - cfg.pl) / cfg.iw * (cfg.n - 1));
     i = Math.max(0, Math.min(cfg.n - 1, i));
-    const px = cfg.pl + cfg.iw * i / (cfg.n - 1);
+    const px = cfg.xAt ? cfg.xAt(i) : cfg.pl + cfg.iw * i / (cfg.n - 1);
     const rows = cfg.rowsAt(i);
     clearGuide();
     const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -3246,7 +3258,8 @@ function renderVolumeTable() {
   `;
   body.appendChild(agg);
 
-  volProcs().forEach(p => {
+  let _volHidden = 0;
+  volProcs().forEach((p, _vi) => {
     const v = volumeStats(p.id);
     const absZ = Math.abs(v.z);
     const status = absZ >= 2.5 ? "bad" : absZ >= 1.5 ? "warn" : "ok";
@@ -3268,15 +3281,30 @@ function renderVolumeTable() {
     `;
     row.onclick = () => selectVolume(p.id, "row");
     kbd(row, p.short + " — volume detail");
+    // Collapse the tail of the table, but never hide a WATCH/ALERT row — the table is the
+    // monitoring surface, so severity must not disappear behind a "+N more".
+    if (_vi >= VOL_TABLE_N && !volListExpanded && status === "ok") { row.style.display = "none"; _volHidden++; }
     body.appendChild(row);
   });
+  if (_volHidden > 0 || volListExpanded) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 7; td.style.padding = "6px 10px";
+    const btn = document.createElement("button");
+    btn.className = "dd-more";
+    btn.textContent = volListExpanded ? "show less" : `+${_volHidden} more processes`;
+    btn.onclick = () => { volListExpanded = !volListExpanded; renderVolumeTable(); };
+    td.appendChild(btn); tr.appendChild(td); body.appendChild(tr);
+  }
 }
 
+let volListExpanded = false;
+const VOL_TABLE_N = 8;
 function renderVolumeCharts() {
   const grid = $("#volGrid");
   if (!grid) return;
   grid.innerHTML = "";
-  volProcs().forEach(p => {
+  volProcs().forEach((p, _vi) => {
     const v = volumeStats(p.id);
     const card = document.createElement("div");
     card.className = "vol-card";
@@ -3390,6 +3418,7 @@ window.closeVolModal = function() {
 function setVolGroup(g) {
   if (g === volGroup) return;
   volGroup = g;
+  volListExpanded = false;
   document.querySelectorAll("#volTabs .tab-btn").forEach(b => b.classList.toggle("active", b.dataset.volgrp === g));
   updateVolUnitNote();
   renderVolumeTable();
